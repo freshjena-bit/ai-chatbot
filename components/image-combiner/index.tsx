@@ -31,7 +31,7 @@ export function ImageCombiner() {
   const isMobile = useMobile();
   const [generationType, setGenerationType] = useState<
     "text" | "image" | "coding" | "other"
-  >("image");
+  >("text");
   const [prompt, setPrompt] = useState(
     "A beautiful landscape with mountains and a lake at sunset"
   );
@@ -45,6 +45,7 @@ export function ImageCombiner() {
     }>
   >([]);
   const [isGeneratingText, setIsGeneratingText] = useState(false);
+  const chatContainerRef = useRef<HTMLDivElement>(null);
 
   // Other tab state
   const [selectedOtherFeature, setSelectedOtherFeature] = useState<
@@ -334,14 +335,26 @@ export function ImageCombiner() {
     if (!textPrompt.trim() || isGeneratingText) return;
 
     const conversationId = Date.now().toString();
+    const userMessage = textPrompt;
+
+    // Clear input and show user message immediately
+    setTextPrompt("");
     setIsGeneratingText(true);
+
+    // Scroll to bottom after adding user message
+    setTimeout(() => {
+      chatContainerRef.current?.scrollTo({
+        top: chatContainerRef.current.scrollHeight,
+        behavior: "smooth",
+      });
+    }, 100);
 
     try {
       const response = await fetch("/api/generate-text", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          prompt: textPrompt,
+          prompt: userMessage,
           aiModel: selectedAiModel,
         }),
       });
@@ -357,16 +370,25 @@ export function ImageCombiner() {
         ...prev,
         {
           id: conversationId,
-          prompt: textPrompt,
+          prompt: userMessage,
           response: data.text,
           timestamp: Date.now(),
         },
       ]);
 
-      setTextPrompt("");
+      // Scroll to bottom after adding AI response
+      setTimeout(() => {
+        chatContainerRef.current?.scrollTo({
+          top: chatContainerRef.current.scrollHeight,
+          behavior: "smooth",
+        });
+      }, 100);
     } catch (error) {
       console.error("Text generation error:", error);
-      alert(error instanceof Error ? error.message : "Failed to generate text");
+      showToast(
+        error instanceof Error ? error.message : "Failed to generate text",
+        "error"
+      );
     } finally {
       setIsGeneratingText(false);
     }
@@ -387,7 +409,8 @@ export function ImageCombiner() {
   const [showHowItWorks, setShowHowItWorks] = useState(false);
   const [apiKeyMissing, setApiKeyMissing] = useState(false);
   const [showAiModal, setShowAiModal] = useState(false);
-  const [selectedAiModel, setSelectedAiModel] = useState("Gemini 2.5 Flash");
+  const [selectedAiModel, setSelectedAiModel] = useState("");
+  const [selectedProvider, setSelectedProvider] = useState("openai");
   const [availableKeys, setAvailableKeys] = useState<Record<string, boolean>>({
     gemini: false,
     openai: false,
@@ -396,6 +419,163 @@ export function ImageCombiner() {
     dalle: false,
     stability: false,
   });
+
+  // Define models by provider
+  const modelsByProvider = {
+    openai: [
+      {
+        id: "gpt-4-turbo",
+        name: "GPT-4 Turbo",
+        description: "Most advanced reasoning and comprehensive knowledge",
+        capabilities: ["Text Gen", "Code Gen"],
+        icon: "4",
+        gradient: "from-green-400 to-emerald-500",
+        color: "green",
+        keyName: "openai",
+      },
+      {
+        id: "gpt-4o",
+        name: "GPT-4o",
+        description:
+          "Optimized for speed and efficiency with multimodal support",
+        capabilities: ["Text Gen", "Code Gen", "Vision"],
+        icon: "O",
+        gradient: "from-green-400 to-emerald-500",
+        color: "green",
+        keyName: "openai",
+      },
+      {
+        id: "gpt-3.5-turbo",
+        name: "GPT-3.5 Turbo",
+        description: "Fast and efficient for everyday tasks",
+        capabilities: ["Text Gen", "Code Gen"],
+        icon: "3",
+        gradient: "from-green-400 to-emerald-500",
+        color: "green",
+        keyName: "openai",
+      },
+    ],
+    google: [
+      {
+        id: "gemini-2.0-flash-exp",
+        name: "Gemini 2.0 Flash",
+        description:
+          "Latest experimental model with enhanced multimodal capabilities",
+        capabilities: ["Image Gen", "Text Gen", "Code Gen"],
+        icon: "2",
+        gradient: "from-teal-400 to-cyan-500",
+        color: "teal",
+        keyName: "gemini",
+      },
+      {
+        id: "gemini-1.5-pro",
+        name: "Gemini 1.5 Pro",
+        description: "Advanced reasoning with long context window",
+        capabilities: ["Text Gen", "Code Gen", "Vision"],
+        icon: "P",
+        gradient: "from-teal-400 to-cyan-500",
+        color: "teal",
+        keyName: "gemini",
+      },
+      {
+        id: "gemini-1.5-flash",
+        name: "Gemini 1.5 Flash",
+        description: "Fast and efficient multimodal AI",
+        capabilities: ["Image Gen", "Text Gen", "Code Gen"],
+        icon: "F",
+        gradient: "from-teal-400 to-cyan-500",
+        color: "teal",
+        keyName: "gemini",
+      },
+    ],
+    claude: [
+      {
+        id: "claude-3.5-sonnet",
+        name: "Claude 3.5 Sonnet",
+        description: "Balanced performance with strong reasoning capabilities",
+        capabilities: ["Text Gen", "Code Gen"],
+        icon: "S",
+        gradient: "from-purple-400 to-pink-500",
+        color: "purple",
+        keyName: "claude",
+      },
+      {
+        id: "claude-3-opus",
+        name: "Claude 3 Opus",
+        description: "Most powerful model for complex tasks",
+        capabilities: ["Text Gen", "Code Gen"],
+        icon: "O",
+        gradient: "from-purple-400 to-pink-500",
+        color: "purple",
+        keyName: "claude",
+      },
+      {
+        id: "claude-3-haiku",
+        name: "Claude 3 Haiku",
+        description: "Fast and compact for quick responses",
+        capabilities: ["Text Gen", "Code Gen"],
+        icon: "H",
+        gradient: "from-purple-400 to-pink-500",
+        color: "purple",
+        keyName: "claude",
+      },
+    ],
+    dalle: [
+      {
+        id: "dall-e-3",
+        name: "DALL-E 3",
+        description: "High-quality AI image generation",
+        capabilities: ["Image Gen"],
+        icon: "D",
+        gradient: "from-blue-400 to-indigo-500",
+        color: "blue",
+        keyName: "dalle",
+      },
+      {
+        id: "dall-e-2",
+        name: "DALL-E 2",
+        description: "Reliable image generation model",
+        capabilities: ["Image Gen"],
+        icon: "2",
+        gradient: "from-blue-400 to-indigo-500",
+        color: "blue",
+        keyName: "dalle",
+      },
+    ],
+    meta: [
+      {
+        id: "llama-3.1",
+        name: "Llama 3.1",
+        description: "Open-source model for text generation",
+        capabilities: ["Text Gen", "Code Gen"],
+        icon: "L",
+        gradient: "from-orange-400 to-red-500",
+        color: "orange",
+        keyName: "llama",
+      },
+    ],
+    stability: [
+      {
+        id: "stable-diffusion-xl",
+        name: "Stable Diffusion XL",
+        description: "Advanced open-source image generation",
+        capabilities: ["Image Gen"],
+        icon: "S",
+        gradient: "from-pink-400 to-rose-500",
+        color: "pink",
+        keyName: "stability",
+      },
+    ],
+  };
+
+  const providers = [
+    { id: "openai", name: "OpenAI", keyName: "openai" },
+    { id: "google", name: "Google", keyName: "gemini" },
+    { id: "claude", name: "Anthropic", keyName: "claude" },
+    { id: "dalle", name: "DALL-E", keyName: "dalle" },
+    { id: "meta", name: "Meta", keyName: "llama" },
+    { id: "stability", name: "Stability AI", keyName: "stability" },
+  ];
 
   const [leftWidth, setLeftWidth] = useState(50); // percentage
   const [isResizing, setIsResizing] = useState(false);
@@ -411,21 +591,55 @@ export function ImageCombiner() {
     setTimeout(() => setToast(null), 3000);
   };
 
-  // Check for available API keys
+  // Check for available API keys and set default model
   useEffect(() => {
     const checkApiKeys = async () => {
       try {
         const response = await fetch("/api/check-api-keys");
         if (response.ok) {
           const data = await response.json();
-          setAvailableKeys(data.available || {});
+          const keys = data.available || {};
+          setAvailableKeys(keys);
+
+          // Auto-select first available model from first available provider
+          if (!selectedAiModel) {
+            // Find first provider with available API key
+            for (const provider of providers) {
+              if (keys[provider.keyName]) {
+                const models =
+                  modelsByProvider[
+                    provider.id as keyof typeof modelsByProvider
+                  ];
+                if (models && models.length > 0) {
+                  setSelectedAiModel(models[0].name); // Select the first (latest) model
+                  setSelectedProvider(provider.id);
+                  break;
+                }
+              }
+            }
+          }
         }
       } catch (error) {
         console.error("Failed to check API keys:", error);
       }
     };
     checkApiKeys();
-  }, []);
+  }, [selectedAiModel]);
+
+  // Auto-scroll when text conversations or loading state changes
+  useEffect(() => {
+    if (
+      chatContainerRef.current &&
+      (textConversations.length > 0 || isGeneratingText)
+    ) {
+      setTimeout(() => {
+        chatContainerRef.current?.scrollTo({
+          top: chatContainerRef.current.scrollHeight,
+          behavior: "smooth",
+        });
+      }, 100);
+    }
+  }, [textConversations, isGeneratingText]);
 
   const {
     image1,
@@ -1154,7 +1368,7 @@ export function ImageCombiner() {
                 <div className="w-2 h-2 bg-teal-400 rounded-full animate-pulse" />
                 <div className="text-left">
                   <div className="text-xs font-semibold text-teal-300">
-                    {selectedAiModel}
+                    {selectedAiModel || "No model selected"}
                   </div>
                   <div className="text-[9px] text-teal-400/60">
                     Click to change
@@ -1192,7 +1406,7 @@ export function ImageCombiner() {
                 onClick={() => setGenerationType("text")}
                 className={`flex-1 flex items-center justify-center gap-2 px-3 py-3 md:py-3.5 rounded-lg transition-all text-xs md:text-base font-semibold ${
                   generationType === "text"
-                    ? "bg-linear-to-r from-blue-500 to-blue-600 text-white shadow-lg shadow-blue-500/30"
+                    ? "bg-linear-to-r from-orange-500 to-amber-600 text-white shadow-lg shadow-orange-500/30"
                     : "text-white/60 hover:text-white hover:bg-white/10"
                 }`}
               >
@@ -1295,7 +1509,10 @@ export function ImageCombiner() {
                 <div className="space-y-6">
                   <div className="bg-gray-900/60 backdrop-blur-sm border border-gray-800/50 rounded-2xl shadow-2xl overflow-hidden flex flex-col h-[calc(100vh-280px)] min-h-[500px]">
                     {/* Conversation History */}
-                    <div className="flex-1 overflow-y-auto p-6 space-y-4">
+                    <div
+                      ref={chatContainerRef}
+                      className="flex-1 overflow-y-auto p-6 space-y-4 scroll-smooth"
+                    >
                       {textConversations.length === 0 ? (
                         <div className="flex flex-col items-center justify-center h-full text-center">
                           <svg
@@ -1321,14 +1538,17 @@ export function ImageCombiner() {
                         </div>
                       ) : (
                         textConversations.map((conversation) => (
-                          <div key={conversation.id} className="space-y-3">
+                          <div
+                            key={conversation.id}
+                            className="space-y-3 animate-in slide-in-from-bottom-2 duration-300"
+                          >
                             {/* User Message */}
-                            <div className="flex justify-end">
-                              <div className="max-w-[80%] bg-blue-600/90 backdrop-blur-sm text-white rounded-2xl rounded-tr-sm px-4 py-3 shadow-lg">
-                                <p className="text-sm leading-relaxed whitespace-pre-wrap">
+                            <div className="flex justify-end animate-in slide-in-from-right-4 duration-300">
+                              <div className="max-w-[85%] bg-linear-to-r from-purple-600 to-violet-600 backdrop-blur-sm text-white rounded-2xl rounded-tr-sm px-5 py-3.5 shadow-xl">
+                                <p className="text-sm leading-relaxed whitespace-pre-wrap break-words">
                                   {conversation.prompt}
                                 </p>
-                                <p className="text-xs text-blue-200 mt-1.5 opacity-70">
+                                <p className="text-xs text-purple-200 mt-2 opacity-70">
                                   {new Date(
                                     conversation.timestamp
                                   ).toLocaleTimeString()}
@@ -1337,14 +1557,37 @@ export function ImageCombiner() {
                             </div>
 
                             {/* AI Response */}
-                            <div className="flex justify-start">
-                              <div className="max-w-[80%] bg-gray-800/70 backdrop-blur-sm text-gray-100 rounded-2xl rounded-tl-sm px-4 py-3 shadow-lg border border-gray-700/50">
-                                <p className="text-sm leading-relaxed whitespace-pre-wrap">
-                                  {conversation.response}
-                                </p>
-                                <p className="text-xs text-gray-400 mt-1.5">
-                                  AI Response
-                                </p>
+                            <div className="flex justify-start animate-in slide-in-from-left-4 duration-500">
+                              <div className="max-w-[85%] bg-gray-800/70 backdrop-blur-sm text-gray-100 rounded-2xl rounded-tl-sm px-5 py-3.5 shadow-xl border border-purple-500/30">
+                                <div className="text-sm leading-relaxed space-y-2">
+                                  {conversation.response
+                                    .split("\n")
+                                    .map((paragraph, idx) =>
+                                      paragraph.trim() ? (
+                                        <p
+                                          key={idx}
+                                          className="whitespace-pre-wrap break-words"
+                                        >
+                                          {paragraph}
+                                        </p>
+                                      ) : (
+                                        <div key={idx} className="h-2" />
+                                      )
+                                    )}
+                                </div>
+                                <div className="flex items-center gap-2 mt-3 pt-2 border-t border-gray-700/50">
+                                  <svg
+                                    className="w-3.5 h-3.5 text-purple-400"
+                                    fill="currentColor"
+                                    viewBox="0 0 20 20"
+                                  >
+                                    <path d="M2 5a2 2 0 012-2h7a2 2 0 012 2v4a2 2 0 01-2 2H9l-3 3v-3H4a2 2 0 01-2-2V5z" />
+                                    <path d="M15 7v2a4 4 0 01-4 4H9.828l-1.766 1.767c.28.149.599.233.938.233h2l3 3v-3h2a2 2 0 002-2V9a2 2 0 00-2-2h-1z" />
+                                  </svg>
+                                  <p className="text-xs text-gray-400 font-medium">
+                                    AI Response • {selectedAiModel || "AI"}
+                                  </p>
+                                </div>
                               </div>
                             </div>
                           </div>
@@ -1353,25 +1596,25 @@ export function ImageCombiner() {
 
                       {/* Loading State */}
                       {isGeneratingText && (
-                        <div className="flex justify-start">
-                          <div className="max-w-[80%] bg-gray-800/70 backdrop-blur-sm text-gray-100 rounded-2xl rounded-tl-sm px-4 py-3 shadow-lg border border-gray-700/50">
-                            <div className="flex items-center gap-2">
+                        <div className="flex justify-start animate-in slide-in-from-left-4 duration-300">
+                          <div className="max-w-[85%] bg-gray-800/70 backdrop-blur-sm text-gray-100 rounded-2xl rounded-tl-sm px-5 py-3.5 shadow-xl border border-purple-500/30">
+                            <div className="flex items-center gap-3">
                               <div className="flex gap-1">
                                 <div
-                                  className="w-2 h-2 bg-blue-500 rounded-full animate-bounce"
+                                  className="w-2.5 h-2.5 bg-purple-500 rounded-full animate-bounce"
                                   style={{ animationDelay: "0ms" }}
                                 ></div>
                                 <div
-                                  className="w-2 h-2 bg-blue-500 rounded-full animate-bounce"
+                                  className="w-2.5 h-2.5 bg-purple-500 rounded-full animate-bounce"
                                   style={{ animationDelay: "150ms" }}
                                 ></div>
                                 <div
-                                  className="w-2 h-2 bg-blue-500 rounded-full animate-bounce"
+                                  className="w-2.5 h-2.5 bg-purple-500 rounded-full animate-bounce"
                                   style={{ animationDelay: "300ms" }}
                                 ></div>
                               </div>
-                              <span className="text-sm text-gray-400">
-                                Generating...
+                              <span className="text-sm text-gray-300 font-medium animate-pulse">
+                                AI is thinking...
                               </span>
                             </div>
                           </div>
@@ -1380,26 +1623,31 @@ export function ImageCombiner() {
                     </div>
 
                     {/* Input Area */}
-                    <div className="border-t border-gray-800 bg-gray-900/80 backdrop-blur-sm p-6">
-                      <div className="flex gap-3">
-                        <textarea
-                          value={textPrompt}
-                          onChange={(e) => setTextPrompt(e.target.value)}
-                          onKeyDown={(e) => {
-                            if (e.key === "Enter" && !e.shiftKey) {
-                              e.preventDefault();
-                              handleGenerateText();
-                            }
-                          }}
-                          className="flex-1 p-4 bg-gray-800/50 border border-gray-700 rounded-xl text-white placeholder-gray-500 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all resize-none"
-                          rows={3}
-                          placeholder="Type your message... (Press Enter to send, Shift+Enter for new line)"
-                          disabled={isGeneratingText}
-                        />
+                    <div className="border-t border-gray-800 bg-linear-to-b from-gray-900/80 to-gray-900/95 backdrop-blur-sm p-6">
+                      <div className="flex flex-col gap-4">
+                        <div className="relative">
+                          <textarea
+                            value={textPrompt}
+                            onChange={(e) => setTextPrompt(e.target.value)}
+                            onKeyDown={(e) => {
+                              if (e.key === "Enter" && !e.shiftKey) {
+                                e.preventDefault();
+                                handleGenerateText();
+                              }
+                            }}
+                            className="w-full p-5 bg-gray-800/60 border-2 border-gray-700/50 rounded-2xl text-white placeholder-gray-400 focus:ring-2 focus:ring-purple-500/50 focus:border-purple-500/50 transition-all resize-none shadow-xl shadow-black/20 hover:border-gray-600/50"
+                            rows={4}
+                            placeholder="Type your message here... ✨\n(Press Enter to send, Shift+Enter for new line)"
+                            disabled={isGeneratingText}
+                          />
+                          <div className="absolute bottom-3 right-3 text-xs text-gray-500 pointer-events-none">
+                            {textPrompt.length} characters
+                          </div>
+                        </div>
                         <button
                           onClick={handleGenerateText}
                           disabled={!textPrompt.trim() || isGeneratingText}
-                          className="self-end px-6 py-4 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 disabled:from-gray-700 disabled:to-gray-700 disabled:cursor-not-allowed text-white font-semibold rounded-xl shadow-lg shadow-blue-500/30 transition-all flex items-center gap-2"
+                          className="w-full px-8 py-4 bg-gradient-to-r from-purple-600 via-violet-600 to-purple-700 hover:from-purple-700 hover:via-violet-700 hover:to-purple-800 disabled:from-gray-700 disabled:via-gray-700 disabled:to-gray-800 disabled:cursor-not-allowed text-white font-semibold rounded-xl shadow-2xl shadow-purple-500/30 hover:shadow-purple-500/40 disabled:shadow-none transition-all duration-300 flex items-center justify-center gap-3 group"
                         >
                           {isGeneratingText ? (
                             <>
@@ -2333,389 +2581,175 @@ function greet(name) {
                 </button>
               </div>
 
-              {/* AI Models Grid */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3 max-h-[60vh] overflow-y-auto pr-2">
-                {/* Gemini 2.5 Flash */}
-                <button
-                  onClick={() => {
-                    if (availableKeys.gemini) {
-                      setSelectedAiModel("Gemini 2.5 Flash");
-                      setShowAiModal(false);
-                    }
-                  }}
-                  disabled={!availableKeys.gemini}
-                  className={`text-left p-4 rounded-xl border-2 transition-all group relative ${
-                    !availableKeys.gemini
-                      ? "opacity-50 cursor-not-allowed bg-gray-900/50 border-gray-700"
-                      : selectedAiModel === "Gemini 2.5 Flash"
-                      ? "bg-teal-500/20 border-teal-500 shadow-lg shadow-teal-500/20"
-                      : "bg-gray-800/50 border-gray-700 hover:border-teal-500/50 hover:bg-gray-800"
-                  }`}
-                >
-                  {!availableKeys.gemini && (
-                    <div className="absolute top-2 right-2 bg-red-500/20 border border-red-500/50 rounded px-2 py-0.5">
-                      <span className="text-[10px] text-red-400 font-medium">
-                        No API Key
-                      </span>
-                    </div>
-                  )}
-                  <div className="flex items-start justify-between mb-2">
-                    <div className="flex items-center gap-2">
-                      <div className="w-8 h-8 bg-gradient-to-br from-teal-400 to-cyan-500 rounded-lg flex items-center justify-center">
-                        <span className="text-white font-bold text-sm">G</span>
-                      </div>
-                      <div>
-                        <h4 className="font-semibold text-white">
-                          Gemini 2.5 Flash
-                        </h4>
-                        <p className="text-xs text-gray-400">Google AI</p>
-                      </div>
-                    </div>
-                    {selectedAiModel === "Gemini 2.5 Flash" &&
-                      availableKeys.gemini && (
-                        <svg
-                          className="w-5 h-5 text-teal-400"
-                          fill="currentColor"
-                          viewBox="0 0 20 20"
-                        >
-                          <path
-                            fillRule="evenodd"
-                            d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                            clipRule="evenodd"
-                          />
-                        </svg>
-                      )}
-                  </div>
-                  <p className="text-xs text-gray-300 mb-2">
-                    Fast, efficient multimodal AI for images, text, and code
-                    generation.
-                  </p>
-                  <div className="flex gap-2 flex-wrap">
-                    <span className="text-[10px] px-2 py-0.5 bg-teal-500/20 text-teal-300 rounded-full">
-                      Image Gen
-                    </span>
-                    <span className="text-[10px] px-2 py-0.5 bg-teal-500/20 text-teal-300 rounded-full">
-                      Text Gen
-                    </span>
-                    <span className="text-[10px] px-2 py-0.5 bg-teal-500/20 text-teal-300 rounded-full">
-                      Code Gen
-                    </span>
-                  </div>
-                </button>
+              {/* Provider Tabs */}
+              <div className="mb-4 flex gap-2 overflow-x-auto pb-2 scrollbar-thin scrollbar-thumb-gray-700">
+                {providers.map((provider) => {
+                  const isActive = selectedProvider === provider.id;
+                  const hasKey = availableKeys[provider.keyName];
+                  return (
+                    <button
+                      key={provider.id}
+                      onClick={() => setSelectedProvider(provider.id)}
+                      disabled={!hasKey}
+                      className={`px-4 py-2 rounded-lg font-semibold text-sm whitespace-nowrap transition-all ${
+                        !hasKey
+                          ? "opacity-30 cursor-not-allowed bg-gray-800/50 text-gray-500"
+                          : isActive
+                          ? "bg-teal-500/20 text-teal-300 border-2 border-teal-500"
+                          : "bg-gray-800/50 text-gray-400 border-2 border-gray-700 hover:border-teal-500/50 hover:text-teal-400"
+                      }`}
+                    >
+                      {provider.name}
+                      {!hasKey && <span className="ml-1 text-[10px]">🔒</span>}
+                    </button>
+                  );
+                })}
+              </div>
 
-                {/* GPT-4 */}
-                <button
-                  onClick={() => {
-                    if (availableKeys.openai) {
-                      setSelectedAiModel("GPT-4 Turbo");
-                      setShowAiModal(false);
-                    }
-                  }}
-                  disabled={!availableKeys.openai}
-                  className={`text-left p-4 rounded-xl border-2 transition-all group relative ${
-                    !availableKeys.openai
-                      ? "opacity-50 cursor-not-allowed bg-gray-900/50 border-gray-700"
-                      : selectedAiModel === "GPT-4 Turbo"
-                      ? "bg-green-500/20 border-green-500 shadow-lg shadow-green-500/20"
-                      : "bg-gray-800/50 border-gray-700 hover:border-green-500/50 hover:bg-gray-800"
-                  }`}
-                >
-                  {!availableKeys.openai && (
-                    <div className="absolute top-2 right-2 bg-red-500/20 border border-red-500/50 rounded px-2 py-0.5">
-                      <span className="text-[10px] text-red-400 font-medium">
-                        No API Key
-                      </span>
-                    </div>
-                  )}
-                  <div className="flex items-start justify-between mb-2">
-                    <div className="flex items-center gap-2">
-                      <div className="w-8 h-8 bg-gradient-to-br from-green-400 to-emerald-500 rounded-lg flex items-center justify-center">
-                        <span className="text-white font-bold text-sm">4</span>
-                      </div>
-                      <div>
-                        <h4 className="font-semibold text-white">
-                          GPT-4 Turbo
-                        </h4>
-                        <p className="text-xs text-gray-400">OpenAI</p>
-                      </div>
-                    </div>
-                    {selectedAiModel === "GPT-4 Turbo" &&
-                      availableKeys.openai && (
-                        <svg
-                          className="w-5 h-5 text-green-400"
-                          fill="currentColor"
-                          viewBox="0 0 20 20"
-                        >
-                          <path
-                            fillRule="evenodd"
-                            d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                            clipRule="evenodd"
-                          />
-                        </svg>
-                      )}
-                  </div>
-                  <p className="text-xs text-gray-300 mb-2">
-                    Advanced reasoning and comprehensive knowledge for complex
-                    tasks.
-                  </p>
-                  <div className="flex gap-2 flex-wrap">
-                    <span className="text-[10px] px-2 py-0.5 bg-green-500/20 text-green-300 rounded-full">
-                      Text Gen
-                    </span>
-                    <span className="text-[10px] px-2 py-0.5 bg-green-500/20 text-green-300 rounded-full">
-                      Code Gen
-                    </span>
-                  </div>
-                </button>
+              {/* AI Models Grid - filtered by selected provider */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3 max-h-[50vh] overflow-y-auto pr-2">
+                {modelsByProvider[
+                  selectedProvider as keyof typeof modelsByProvider
+                ]?.map((model) => {
+                  const hasKey = availableKeys[model.keyName];
+                  const isSelected = selectedAiModel === model.name;
 
-                {/* Claude 3.5 Sonnet */}
-                <button
-                  onClick={() => {
-                    if (availableKeys.claude) {
-                      setSelectedAiModel("Claude 3.5 Sonnet");
-                      setShowAiModal(false);
-                    }
-                  }}
-                  disabled={!availableKeys.claude}
-                  className={`text-left p-4 rounded-xl border-2 transition-all group relative ${
-                    !availableKeys.claude
-                      ? "opacity-50 cursor-not-allowed bg-gray-900/50 border-gray-700"
-                      : selectedAiModel === "Claude 3.5 Sonnet"
-                      ? "bg-purple-500/20 border-purple-500 shadow-lg shadow-purple-500/20"
-                      : "bg-gray-800/50 border-gray-700 hover:border-purple-500/50 hover:bg-gray-800"
-                  }`}
-                >
-                  {!availableKeys.claude && (
-                    <div className="absolute top-2 right-2 bg-red-500/20 border border-red-500/50 rounded px-2 py-0.5">
-                      <span className="text-[10px] text-red-400 font-medium">
-                        No API Key
-                      </span>
-                    </div>
-                  )}
-                  <div className="flex items-start justify-between mb-2">
-                    <div className="flex items-center gap-2">
-                      <div className="w-8 h-8 bg-gradient-to-br from-purple-400 to-pink-500 rounded-lg flex items-center justify-center">
-                        <span className="text-white font-bold text-sm">C</span>
-                      </div>
-                      <div>
-                        <h4 className="font-semibold text-white">
-                          Claude 3.5 Sonnet
-                        </h4>
-                        <p className="text-xs text-gray-400">Anthropic</p>
-                      </div>
-                    </div>
-                    {selectedAiModel === "Claude 3.5 Sonnet" &&
-                      availableKeys.claude && (
-                        <svg
-                          className="w-5 h-5 text-purple-400"
-                          fill="currentColor"
-                          viewBox="0 0 20 20"
-                        >
-                          <path
-                            fillRule="evenodd"
-                            d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                            clipRule="evenodd"
-                          />
-                        </svg>
-                      )}
-                  </div>
-                  <p className="text-xs text-gray-300 mb-2">
-                    Balanced performance with strong reasoning and creative
-                    capabilities.
-                  </p>
-                  <div className="flex gap-2 flex-wrap">
-                    <span className="text-[10px] px-2 py-0.5 bg-purple-500/20 text-purple-300 rounded-full">
-                      Text Gen
-                    </span>
-                    <span className="text-[10px] px-2 py-0.5 bg-purple-500/20 text-purple-300 rounded-full">
-                      Code Gen
-                    </span>
-                  </div>
-                </button>
+                  // Define color classes based on model color
+                  const getColorClasses = (color: string) => {
+                    const colorMap: Record<
+                      string,
+                      {
+                        bg: string;
+                        border: string;
+                        shadow: string;
+                        text: string;
+                        badge: string;
+                      }
+                    > = {
+                      green: {
+                        bg: "bg-green-500/20",
+                        border: "border-green-500",
+                        shadow: "shadow-green-500/20",
+                        text: "text-green-400",
+                        badge: "bg-green-500/20 text-green-300",
+                      },
+                      teal: {
+                        bg: "bg-teal-500/20",
+                        border: "border-teal-500",
+                        shadow: "shadow-teal-500/20",
+                        text: "text-teal-400",
+                        badge: "bg-teal-500/20 text-teal-300",
+                      },
+                      purple: {
+                        bg: "bg-purple-500/20",
+                        border: "border-purple-500",
+                        shadow: "shadow-purple-500/20",
+                        text: "text-purple-400",
+                        badge: "bg-purple-500/20 text-purple-300",
+                      },
+                      blue: {
+                        bg: "bg-blue-500/20",
+                        border: "border-blue-500",
+                        shadow: "shadow-blue-500/20",
+                        text: "text-blue-400",
+                        badge: "bg-blue-500/20 text-blue-300",
+                      },
+                      orange: {
+                        bg: "bg-orange-500/20",
+                        border: "border-orange-500",
+                        shadow: "shadow-orange-500/20",
+                        text: "text-orange-400",
+                        badge: "bg-orange-500/20 text-orange-300",
+                      },
+                      pink: {
+                        bg: "bg-pink-500/20",
+                        border: "border-pink-500",
+                        shadow: "shadow-pink-500/20",
+                        text: "text-pink-400",
+                        badge: "bg-pink-500/20 text-pink-300",
+                      },
+                    };
+                    return colorMap[color] || colorMap.teal;
+                  };
 
-                {/* DALL-E 3 */}
-                <button
-                  onClick={() => {
-                    if (availableKeys.dalle) {
-                      setSelectedAiModel("DALL-E 3");
-                      setShowAiModal(false);
-                    }
-                  }}
-                  disabled={!availableKeys.dalle}
-                  className={`text-left p-4 rounded-xl border-2 transition-all group relative ${
-                    !availableKeys.dalle
-                      ? "opacity-50 cursor-not-allowed bg-gray-900/50 border-gray-700"
-                      : selectedAiModel === "DALL-E 3"
-                      ? "bg-blue-500/20 border-blue-500 shadow-lg shadow-blue-500/20"
-                      : "bg-gray-800/50 border-gray-700 hover:border-blue-500/50 hover:bg-gray-800"
-                  }`}
-                >
-                  {!availableKeys.dalle && (
-                    <div className="absolute top-2 right-2 bg-red-500/20 border border-red-500/50 rounded px-2 py-0.5">
-                      <span className="text-[10px] text-red-400 font-medium">
-                        No API Key
-                      </span>
-                    </div>
-                  )}
-                  <div className="flex items-start justify-between mb-2">
-                    <div className="flex items-center gap-2">
-                      <div className="w-8 h-8 bg-gradient-to-br from-blue-400 to-indigo-500 rounded-lg flex items-center justify-center">
-                        <span className="text-white font-bold text-sm">D</span>
-                      </div>
-                      <div>
-                        <h4 className="font-semibold text-white">DALL-E 3</h4>
-                        <p className="text-xs text-gray-400">OpenAI</p>
-                      </div>
-                    </div>
-                    {selectedAiModel === "DALL-E 3" && availableKeys.dalle && (
-                      <svg
-                        className="w-5 h-5 text-blue-400"
-                        fill="currentColor"
-                        viewBox="0 0 20 20"
-                      >
-                        <path
-                          fillRule="evenodd"
-                          d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                          clipRule="evenodd"
-                        />
-                      </svg>
-                    )}
-                  </div>
-                  <p className="text-xs text-gray-300 mb-2">
-                    Creative image generation with precise prompt following.
-                  </p>
-                  <div className="flex gap-2 flex-wrap">
-                    <span className="text-[10px] px-2 py-0.5 bg-blue-500/20 text-blue-300 rounded-full">
-                      Image Gen
-                    </span>
-                  </div>
-                </button>
+                  const colors = getColorClasses(model.color);
 
-                {/* Llama 3.1 */}
-                <button
-                  onClick={() => {
-                    if (availableKeys.llama) {
-                      setSelectedAiModel("Llama 3.1 405B");
-                      setShowAiModal(false);
-                    }
-                  }}
-                  disabled={!availableKeys.llama}
-                  className={`text-left p-4 rounded-xl border-2 transition-all group relative ${
-                    !availableKeys.llama
-                      ? "opacity-50 cursor-not-allowed bg-gray-900/50 border-gray-700"
-                      : selectedAiModel === "Llama 3.1 405B"
-                      ? "bg-orange-500/20 border-orange-500 shadow-lg shadow-orange-500/20"
-                      : "bg-gray-800/50 border-gray-700 hover:border-orange-500/50 hover:bg-gray-800"
-                  }`}
-                >
-                  {!availableKeys.llama && (
-                    <div className="absolute top-2 right-2 bg-red-500/20 border border-red-500/50 rounded px-2 py-0.5">
-                      <span className="text-[10px] text-red-400 font-medium">
-                        No API Key
-                      </span>
-                    </div>
-                  )}
-                  <div className="flex items-start justify-between mb-2">
-                    <div className="flex items-center gap-2">
-                      <div className="w-8 h-8 bg-gradient-to-br from-orange-400 to-red-500 rounded-lg flex items-center justify-center">
-                        <span className="text-white font-bold text-sm">L</span>
-                      </div>
-                      <div>
-                        <h4 className="font-semibold text-white">
-                          Llama 3.1 405B
-                        </h4>
-                        <p className="text-xs text-gray-400">Meta</p>
-                      </div>
-                    </div>
-                    {selectedAiModel === "Llama 3.1 405B" &&
-                      availableKeys.llama && (
-                        <svg
-                          className="w-5 h-5 text-orange-400"
-                          fill="currentColor"
-                          viewBox="0 0 20 20"
-                        >
-                          <path
-                            fillRule="evenodd"
-                            d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                            clipRule="evenodd"
-                          />
-                        </svg>
+                  return (
+                    <button
+                      key={model.id}
+                      onClick={() => {
+                        if (hasKey) {
+                          setSelectedAiModel(model.name);
+                          setShowAiModal(false);
+                        }
+                      }}
+                      disabled={!hasKey}
+                      className={`text-left p-4 rounded-xl border-2 transition-all group relative ${
+                        !hasKey
+                          ? "opacity-50 cursor-not-allowed bg-gray-900/50 border-gray-700"
+                          : isSelected
+                          ? `${colors.bg} ${colors.border} shadow-lg ${colors.shadow}`
+                          : `bg-gray-800/50 border-gray-700 hover:${colors.border} hover:bg-gray-800`
+                      }`}
+                    >
+                      {!hasKey && (
+                        <div className="absolute top-2 right-2 bg-red-500/20 border border-red-500/50 rounded px-2 py-0.5">
+                          <span className="text-[10px] text-red-400 font-medium">
+                            No API Key
+                          </span>
+                        </div>
                       )}
-                  </div>
-                  <p className="text-xs text-gray-300 mb-2">
-                    Open-source powerhouse with exceptional multilingual
-                    capabilities.
-                  </p>
-                  <div className="flex gap-2 flex-wrap">
-                    <span className="text-[10px] px-2 py-0.5 bg-orange-500/20 text-orange-300 rounded-full">
-                      Text Gen
-                    </span>
-                    <span className="text-[10px] px-2 py-0.5 bg-orange-500/20 text-orange-300 rounded-full">
-                      Code Gen
-                    </span>
-                  </div>
-                </button>
-
-                {/* Stable Diffusion XL */}
-                <button
-                  onClick={() => {
-                    if (availableKeys.stability) {
-                      setSelectedAiModel("Stable Diffusion XL");
-                      setShowAiModal(false);
-                    }
-                  }}
-                  disabled={!availableKeys.stability}
-                  className={`text-left p-4 rounded-xl border-2 transition-all group relative ${
-                    !availableKeys.stability
-                      ? "opacity-50 cursor-not-allowed bg-gray-900/50 border-gray-700"
-                      : selectedAiModel === "Stable Diffusion XL"
-                      ? "bg-pink-500/20 border-pink-500 shadow-lg shadow-pink-500/20"
-                      : "bg-gray-800/50 border-gray-700 hover:border-pink-500/50 hover:bg-gray-800"
-                  }`}
-                >
-                  {!availableKeys.stability && (
-                    <div className="absolute top-2 right-2 bg-red-500/20 border border-red-500/50 rounded px-2 py-0.5">
-                      <span className="text-[10px] text-red-400 font-medium">
-                        No API Key
-                      </span>
-                    </div>
-                  )}
-                  <div className="flex items-start justify-between mb-2">
-                    <div className="flex items-center gap-2">
-                      <div className="w-8 h-8 bg-gradient-to-br from-pink-400 to-rose-500 rounded-lg flex items-center justify-center">
-                        <span className="text-white font-bold text-sm">S</span>
+                      <div className="flex items-start justify-between mb-2">
+                        <div className="flex items-center gap-2">
+                          <div
+                            className={`w-8 h-8 bg-gradient-to-br ${model.gradient} rounded-lg flex items-center justify-center`}
+                          >
+                            <span className="text-white font-bold text-sm">
+                              {model.icon}
+                            </span>
+                          </div>
+                          <div>
+                            <h4 className="font-semibold text-white">
+                              {model.name}
+                            </h4>
+                            <p className="text-xs text-gray-400">
+                              {
+                                providers.find((p) => p.id === selectedProvider)
+                                  ?.name
+                              }
+                            </p>
+                          </div>
+                        </div>
+                        {isSelected && hasKey && (
+                          <svg
+                            className={`w-5 h-5 ${colors.text}`}
+                            fill="currentColor"
+                            viewBox="0 0 20 20"
+                          >
+                            <path
+                              fillRule="evenodd"
+                              d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                              clipRule="evenodd"
+                            />
+                          </svg>
+                        )}
                       </div>
-                      <div>
-                        <h4 className="font-semibold text-white">
-                          Stable Diffusion XL
-                        </h4>
-                        <p className="text-xs text-gray-400">Stability AI</p>
+                      <p className="text-xs text-gray-300 mb-2">
+                        {model.description}
+                      </p>
+                      <div className="flex gap-2 flex-wrap">
+                        {model.capabilities.map((cap) => (
+                          <span
+                            key={cap}
+                            className={`text-[10px] px-2 py-0.5 ${colors.badge} rounded-full`}
+                          >
+                            {cap}
+                          </span>
+                        ))}
                       </div>
-                    </div>
-                    {selectedAiModel === "Stable Diffusion XL" &&
-                      availableKeys.stability && (
-                        <svg
-                          className="w-5 h-5 text-pink-400"
-                          fill="currentColor"
-                          viewBox="0 0 20 20"
-                        >
-                          <path
-                            fillRule="evenodd"
-                            d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                            clipRule="evenodd"
-                          />
-                        </svg>
-                      )}
-                  </div>
-                  <p className="text-xs text-gray-300 mb-2">
-                    High-quality open-source image generation with fine control.
-                  </p>
-                  <div className="flex gap-2 flex-wrap">
-                    <span className="text-[10px] px-2 py-0.5 bg-pink-500/20 text-pink-300 rounded-full">
-                      Image Gen
-                    </span>
-                  </div>
-                </button>
+                    </button>
+                  );
+                })}
               </div>
 
               {/* Footer Info */}

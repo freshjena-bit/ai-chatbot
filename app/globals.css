@@ -104,6 +104,10 @@
     background-color: #000000 !important;
   }
 
+  button {
+    @apply cursor-pointer;
+  }
+
   /* Optimize background shader rendering with containment and hardware acceleration */
   .shader-background {
     contain: layout style paint;

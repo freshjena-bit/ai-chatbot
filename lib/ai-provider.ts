@@ -21,19 +21,37 @@ export interface AIProviderInfo {
 
 // Map AI model display names to their providers
 export const AI_MODEL_TO_PROVIDER: Record<string, AIProvider> = {
-  "Gemini 2.5 Flash": "gemini",
+  // Google Models
+  "Gemini 2.0 Flash": "gemini",
+  "Gemini 1.5 Pro": "gemini",
+  "Gemini 1.5 Flash": "gemini",
+  
+  // OpenAI Models
   "GPT-4 Turbo": "openai",
+  "GPT-4o": "openai",
+  "GPT-3.5 Turbo": "openai",
+  
+  // Anthropic Models
   "Claude 3.5 Sonnet": "claude",
+  "Claude 3 Opus": "claude",
+  "Claude 3 Haiku": "claude",
+  
+  // DALL-E Models (via OpenAI)
   "DALL-E 3": "openai",
-  "Llama 3.1 405B": "openai", // Using OpenAI-compatible API
-  "Stable Diffusion XL": "openai", // Using OpenAI-compatible API
+  "DALL-E 2": "openai",
+  
+  // Meta Models (via OpenAI-compatible API)
+  "Llama 3.1": "openai",
+  
+  // Stability AI (via OpenAI-compatible API)
+  "Stable Diffusion XL": "openai",
 };
 
 export const AI_PROVIDERS: Record<AIProvider, AIProviderInfo> = {
   gemini: {
     name: "Google Gemini",
     envKeyName: "GEMINI_API_KEY",
-    defaultModel: "gemini-1.5-flash",
+    defaultModel: "gemini-2.0-flash-exp",
     imageModel: "imagen-3.0-generate-001",
     supportsImageGeneration: false, // Gemini doesn't support image generation via AI SDK
   },
@@ -60,14 +78,12 @@ export const AI_PROVIDERS: Record<AIProvider, AIProviderInfo> = {
 };
 
 export function getAIProvider(overrideProvider?: AIProvider) {
-  // Use override provider if provided, otherwise fall back to env variable
-  const apiSource = (overrideProvider ||
-    (process.env.API_SOURCE?.toLowerCase() as AIProvider) ||
-    "gemini") as AIProvider;
+  // Use override provider if provided, otherwise default to openai
+  const apiSource = (overrideProvider || "openai") as AIProvider;
 
   if (!AI_PROVIDERS[apiSource]) {
     throw new Error(
-      `Invalid API_SOURCE: ${apiSource}. Must be one of: ${Object.keys(
+      `Invalid provider: ${apiSource}. Must be one of: ${Object.keys(
         AI_PROVIDERS
       ).join(", ")}`
     );
