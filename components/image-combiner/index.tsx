@@ -16,7 +16,6 @@ import { ToastNotification } from "./toast-notification";
 import { GenerationHistory } from "./generation-history";
 import { GlobalDropZone } from "./global-drop-zone";
 import { FullscreenViewer } from "./fullscreen-viewer";
-import { Skeleton } from "@/components/ui/skeleton";
 import { ApiKeyWarning } from "@/components/api-key-warning";
 import {
   Select,
@@ -382,8 +381,9 @@ export function ImageCombiner() {
   const [dragCounter, setDragCounter] = useState(0);
   const [dropZoneHover, setDropZoneHover] = useState<1 | 2 | null>(null);
   const [showHowItWorks, setShowHowItWorks] = useState(false);
-  const [logoLoaded, setLogoLoaded] = useState(false);
   const [apiKeyMissing, setApiKeyMissing] = useState(false);
+  const [showAiModal, setShowAiModal] = useState(false);
+  const [selectedAiModel, setSelectedAiModel] = useState("Gemini 2.5 Flash");
 
   const [leftWidth, setLeftWidth] = useState(50); // percentage
   const [isResizing, setIsResizing] = useState(false);
@@ -414,12 +414,8 @@ export function ImageCombiner() {
     showToast: uploadShowToast,
   } = useImageUpload();
 
-  const {
-    aspectRatio,
-    setAspectRatio,
-    availableAspectRatios,
-    detectAspectRatio,
-  } = useAspectRatio();
+  const { aspectRatio, setAspectRatio, availableAspectRatios } =
+    useAspectRatio();
 
   const {
     generations: persistedGenerations,
@@ -1107,140 +1103,162 @@ export function ImageCombiner() {
         />
       </div>
 
-      <div className="relative z-10 w-full h-full flex items-center justify-center p-2 md:p-4">
-        <div className="w-full max-w-[98vw] lg:max-w-[96vw] 2xl:max-w-[94vw]">
-          <div className="w-full mx-auto select-none">
-            <div className="bg-black/70 border-0 px-3 py-3 md:px-4 md:py-4 lg:px-6 lg:py-6 flex flex-col rounded-lg">
-              <div className="flex items-start justify-between gap-4 mb-2 md:mb-3 flex-shrink-0">
+      <div className="relative z-10 w-full h-screen flex flex-col">
+        {/* Header */}
+        <header className="bg-black/80 backdrop-blur-sm border-b border-white/10 px-4 py-3 md:px-6 md:py-4">
+          <div className="max-w-7xl mx-auto">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
                 <div>
-                  {!logoLoaded && (
-                    <Skeleton className="w-6 h-6 md:w-7 md:h-7 mb-0.5 md:mb-1 rounded" />
-                  )}
-                  <img
-                    src="/v0-logo.svg"
-                    alt="v0 logo"
-                    width="28"
-                    height="28"
-                    className={`w-6 h-6 md:w-7 md:h-7 mb-0.5 md:mt-1 ${
-                      logoLoaded ? "block" : "hidden"
-                    }`}
-                    onLoad={() => setLogoLoaded(true)}
-                  />
-                  <h1 className="text-lg md:text-2xl font-bold text-white select-none leading-none">
-                    <div className="md:hidden">Nano</div>
-                    <div className="md:hidden mt-0.5">Banana Pro</div>
-                    <div className="hidden md:block">Nano Banana Pro</div>
+                  <h1 className="text-xl md:text-3xl font-bold text-white select-none leading-none">
+                    Nano Banana Pro
                   </h1>
-                  <p className="text-[9px] md:text-[10px] text-gray-400 select-none tracking-wide mt-0.5 md:mt-1">
-                    Playground by{" "}
-                    <a
-                      href="https://vercel.com/ai-gateway"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="hover:text-gray-300 transition-colors"
-                    >
-                      Vercel AI Gateway
-                    </a>
+                  <p className="text-[10px] md:text-xs text-gray-400 select-none mt-1">
+                    AI-Powered Creative Playground
                   </p>
                 </div>
               </div>
+              <button
+                onClick={() => setShowAiModal(true)}
+                className="flex items-center gap-2 px-3 py-2 bg-teal-500/10 hover:bg-teal-500/20 border border-teal-500/30 rounded-lg transition-all group"
+              >
+                <div className="w-2 h-2 bg-teal-400 rounded-full animate-pulse" />
+                <div className="text-left">
+                  <div className="text-xs font-semibold text-teal-300">
+                    {selectedAiModel}
+                  </div>
+                  <div className="text-[9px] text-teal-400/60">
+                    Click to change
+                  </div>
+                </div>
+                <svg
+                  className="w-4 h-4 text-teal-400 group-hover:rotate-90 transition-transform"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"
+                  />
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                  />
+                </svg>
+              </button>
+            </div>
+          </div>
+        </header>
 
-              {/* Global Generation Type Tabs */}
-              <div className="mb-6 flex gap-2 p-1.5 bg-black/50 rounded-xl border border-white/20 max-w-2xl mx-auto w-full">
-                <button
-                  onClick={() => setGenerationType("text")}
-                  className={`flex-1 flex items-center justify-center gap-2 px-3 py-2.5 rounded-lg transition-all text-xs md:text-sm font-semibold ${
-                    generationType === "text"
-                      ? "bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-lg shadow-blue-500/30"
-                      : "text-white/60 hover:text-white hover:bg-white/10"
-                  }`}
+        {/* Tabs Section */}
+        <div className="bg-black/70 backdrop-blur-sm border-b border-white/10 px-4 py-3 md:px-6 md:py-4">
+          <div className="max-w-7xl mx-auto">
+            <div className="flex gap-2 p-1.5 bg-black/50 rounded-xl border border-white/20">
+              <button
+                onClick={() => setGenerationType("text")}
+                className={`flex-1 flex items-center justify-center gap-2 px-3 py-3 md:py-3.5 rounded-lg transition-all text-xs md:text-base font-semibold ${
+                  generationType === "text"
+                    ? "bg-linear-to-r from-blue-500 to-blue-600 text-white shadow-lg shadow-blue-500/30"
+                    : "text-white/60 hover:text-white hover:bg-white/10"
+                }`}
+              >
+                <svg
+                  className="w-5 h-5 md:w-6 md:h-6"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
                 >
-                  <svg
-                    className="w-4 h-4 md:w-5 md:h-5"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-                    />
-                  </svg>
-                  <span>Text</span>
-                </button>
-                <button
-                  onClick={() => setGenerationType("image")}
-                  className={`flex-1 flex items-center justify-center gap-2 px-3 py-2.5 rounded-lg transition-all text-xs md:text-sm font-semibold ${
-                    generationType === "image"
-                      ? "bg-gradient-to-r from-purple-500 to-pink-600 text-white shadow-lg shadow-purple-500/30"
-                      : "text-white/60 hover:text-white hover:bg-white/10"
-                  }`}
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                  />
+                </svg>
+                <span className="hidden sm:inline">Text</span>
+              </button>
+              <button
+                onClick={() => setGenerationType("image")}
+                className={`flex-1 flex items-center justify-center gap-2 px-3 py-3 md:py-3.5 rounded-lg transition-all text-xs md:text-base font-semibold ${
+                  generationType === "image"
+                    ? "bg-linear-to-r from-purple-500 to-pink-600 text-white shadow-lg shadow-purple-500/30"
+                    : "text-white/60 hover:text-white hover:bg-white/10"
+                }`}
+              >
+                <svg
+                  className="w-5 h-5 md:w-6 md:h-6"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
                 >
-                  <svg
-                    className="w-4 h-4 md:w-5 md:h-5"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
-                    />
-                  </svg>
-                  <span>Image</span>
-                </button>
-                <button
-                  onClick={() => setGenerationType("coding")}
-                  className={`flex-1 flex items-center justify-center gap-2 px-3 py-2.5 rounded-lg transition-all text-xs md:text-sm font-semibold ${
-                    generationType === "coding"
-                      ? "bg-gradient-to-r from-yellow-500 to-orange-600 text-white shadow-lg shadow-yellow-500/30"
-                      : "text-white/60 hover:text-white hover:bg-white/10"
-                  }`}
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
+                  />
+                </svg>
+                <span className="hidden sm:inline">Image</span>
+              </button>
+              <button
+                onClick={() => setGenerationType("coding")}
+                className={`flex-1 flex items-center justify-center gap-2 px-3 py-3 md:py-3.5 rounded-lg transition-all text-xs md:text-base font-semibold ${
+                  generationType === "coding"
+                    ? "bg-linear-to-r from-yellow-500 to-orange-600 text-white shadow-lg shadow-yellow-500/30"
+                    : "text-white/60 hover:text-white hover:bg-white/10"
+                }`}
+              >
+                <svg
+                  className="w-5 h-5 md:w-6 md:h-6"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
                 >
-                  <svg
-                    className="w-4 h-4 md:w-5 md:h-5"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"
-                    />
-                  </svg>
-                  <span>Coding</span>
-                </button>
-                <button
-                  onClick={() => setGenerationType("other")}
-                  className={`flex-1 flex items-center justify-center gap-2 px-3 py-2.5 rounded-lg transition-all text-xs md:text-sm font-semibold ${
-                    generationType === "other"
-                      ? "bg-gradient-to-r from-green-500 to-emerald-600 text-white shadow-lg shadow-green-500/30"
-                      : "text-white/60 hover:text-white hover:bg-white/10"
-                  }`}
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"
+                  />
+                </svg>
+                <span className="hidden sm:inline">Coding</span>
+              </button>
+              <button
+                onClick={() => setGenerationType("other")}
+                className={`flex-1 flex items-center justify-center gap-2 px-3 py-3 md:py-3.5 rounded-lg transition-all text-xs md:text-base font-semibold ${
+                  generationType === "other"
+                    ? "bg-linear-to-r from-green-500 to-emerald-600 text-white shadow-lg shadow-green-500/30"
+                    : "text-white/60 hover:text-white hover:bg-white/10"
+                }`}
+              >
+                <svg
+                  className="w-5 h-5 md:w-6 md:h-6"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
                 >
-                  <svg
-                    className="w-4 h-4 md:w-5 md:h-5"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"
-                    />
-                  </svg>
-                  <span>Other</span>
-                </button>
-              </div>
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"
+                  />
+                </svg>
+                <span className="hidden sm:inline">Other</span>
+              </button>
+            </div>
+          </div>
+        </div>
 
+        {/* Content Area */}
+        <div className="flex-1 overflow-auto p-4 md:p-6">
+          <div className="max-w-7xl mx-auto">
+            <div className="bg-black/70 border-0 px-3 py-3 md:px-4 md:py-4 lg:px-6 lg:py-6 rounded-lg">
               {apiKeyMissing && <ApiKeyWarning />}
 
               {/* Text Generation Mode */}
@@ -2189,7 +2207,8 @@ function greet(name) {
                 </div>
               )}
 
-              <div className="mt-4 border-t border-white/10 pt-5 flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-4 text-xs text-white/60 flex-shrink-0">
+              {/* Footer */}
+              <div className="mt-8 border-t border-white/10 pt-5 flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-4 text-xs text-white/60">
                 <a
                   href="https://v0.dev/chat/template-link-here"
                   target="_blank"
@@ -2221,6 +2240,403 @@ function greet(name) {
       </div>
 
       <HowItWorksModal open={showHowItWorks} onOpenChange={setShowHowItWorks} />
+
+      {/* AI Model Selection Modal */}
+      {showAiModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          {/* Backdrop */}
+          <div
+            className="absolute inset-0 bg-black/80 backdrop-blur-sm animate-in fade-in duration-200"
+            onClick={() => setShowAiModal(false)}
+          />
+
+          {/* Modal */}
+          <div className="relative bg-gradient-to-br from-gray-900 to-black border border-teal-500/30 rounded-2xl shadow-2xl max-w-2xl w-full overflow-hidden animate-in zoom-in-95 slide-in-from-bottom-4 duration-300">
+            {/* Animated gradient border effect */}
+            <div className="absolute inset-0 bg-linear-to-r from-teal-500/10 via-cyan-500/10 to-teal-500/10 animate-pulse pointer-events-none" />
+
+            {/* Content */}
+            <div className="relative p-6">
+              {/* Header */}
+              <div className="flex items-center justify-between mb-6">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 bg-teal-500/20 rounded-lg flex items-center justify-center">
+                    <svg
+                      className="w-6 h-6 text-teal-400"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
+                      />
+                    </svg>
+                  </div>
+                  <div>
+                    <h3 className="text-xl font-bold text-white">
+                      Select AI Model
+                    </h3>
+                    <p className="text-xs text-gray-400">
+                      Choose your preferred AI model
+                    </p>
+                  </div>
+                </div>
+                <button
+                  onClick={() => setShowAiModal(false)}
+                  className="text-gray-400 hover:text-white transition-colors"
+                >
+                  <svg
+                    className="w-6 h-6"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M6 18L18 6M6 6l12 12"
+                    />
+                  </svg>
+                </button>
+              </div>
+
+              {/* AI Models Grid */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3 max-h-[60vh] overflow-y-auto pr-2">
+                {/* Gemini 2.5 Flash */}
+                <button
+                  onClick={() => {
+                    setSelectedAiModel("Gemini 2.5 Flash");
+                    setShowAiModal(false);
+                  }}
+                  className={`text-left p-4 rounded-xl border-2 transition-all group ${
+                    selectedAiModel === "Gemini 2.5 Flash"
+                      ? "bg-teal-500/20 border-teal-500 shadow-lg shadow-teal-500/20"
+                      : "bg-gray-800/50 border-gray-700 hover:border-teal-500/50 hover:bg-gray-800"
+                  }`}
+                >
+                  <div className="flex items-start justify-between mb-2">
+                    <div className="flex items-center gap-2">
+                      <div className="w-8 h-8 bg-gradient-to-br from-teal-400 to-cyan-500 rounded-lg flex items-center justify-center">
+                        <span className="text-white font-bold text-sm">G</span>
+                      </div>
+                      <div>
+                        <h4 className="font-semibold text-white">
+                          Gemini 2.5 Flash
+                        </h4>
+                        <p className="text-xs text-gray-400">Google AI</p>
+                      </div>
+                    </div>
+                    {selectedAiModel === "Gemini 2.5 Flash" && (
+                      <svg
+                        className="w-5 h-5 text-teal-400"
+                        fill="currentColor"
+                        viewBox="0 0 20 20"
+                      >
+                        <path
+                          fillRule="evenodd"
+                          d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                          clipRule="evenodd"
+                        />
+                      </svg>
+                    )}
+                  </div>
+                  <p className="text-xs text-gray-300 mb-2">
+                    Fast, efficient multimodal AI for images, text, and code
+                    generation.
+                  </p>
+                  <div className="flex gap-2 flex-wrap">
+                    <span className="text-[10px] px-2 py-0.5 bg-teal-500/20 text-teal-300 rounded-full">
+                      Image Gen
+                    </span>
+                    <span className="text-[10px] px-2 py-0.5 bg-teal-500/20 text-teal-300 rounded-full">
+                      Text Gen
+                    </span>
+                    <span className="text-[10px] px-2 py-0.5 bg-teal-500/20 text-teal-300 rounded-full">
+                      Code Gen
+                    </span>
+                  </div>
+                </button>
+
+                {/* GPT-4 */}
+                <button
+                  onClick={() => {
+                    setSelectedAiModel("GPT-4 Turbo");
+                    setShowAiModal(false);
+                  }}
+                  className={`text-left p-4 rounded-xl border-2 transition-all group ${
+                    selectedAiModel === "GPT-4 Turbo"
+                      ? "bg-green-500/20 border-green-500 shadow-lg shadow-green-500/20"
+                      : "bg-gray-800/50 border-gray-700 hover:border-green-500/50 hover:bg-gray-800"
+                  }`}
+                >
+                  <div className="flex items-start justify-between mb-2">
+                    <div className="flex items-center gap-2">
+                      <div className="w-8 h-8 bg-gradient-to-br from-green-400 to-emerald-500 rounded-lg flex items-center justify-center">
+                        <span className="text-white font-bold text-sm">4</span>
+                      </div>
+                      <div>
+                        <h4 className="font-semibold text-white">
+                          GPT-4 Turbo
+                        </h4>
+                        <p className="text-xs text-gray-400">OpenAI</p>
+                      </div>
+                    </div>
+                    {selectedAiModel === "GPT-4 Turbo" && (
+                      <svg
+                        className="w-5 h-5 text-green-400"
+                        fill="currentColor"
+                        viewBox="0 0 20 20"
+                      >
+                        <path
+                          fillRule="evenodd"
+                          d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                          clipRule="evenodd"
+                        />
+                      </svg>
+                    )}
+                  </div>
+                  <p className="text-xs text-gray-300 mb-2">
+                    Advanced reasoning and comprehensive knowledge for complex
+                    tasks.
+                  </p>
+                  <div className="flex gap-2 flex-wrap">
+                    <span className="text-[10px] px-2 py-0.5 bg-green-500/20 text-green-300 rounded-full">
+                      Text Gen
+                    </span>
+                    <span className="text-[10px] px-2 py-0.5 bg-green-500/20 text-green-300 rounded-full">
+                      Code Gen
+                    </span>
+                  </div>
+                </button>
+
+                {/* Claude 3.5 Sonnet */}
+                <button
+                  onClick={() => {
+                    setSelectedAiModel("Claude 3.5 Sonnet");
+                    setShowAiModal(false);
+                  }}
+                  className={`text-left p-4 rounded-xl border-2 transition-all group ${
+                    selectedAiModel === "Claude 3.5 Sonnet"
+                      ? "bg-purple-500/20 border-purple-500 shadow-lg shadow-purple-500/20"
+                      : "bg-gray-800/50 border-gray-700 hover:border-purple-500/50 hover:bg-gray-800"
+                  }`}
+                >
+                  <div className="flex items-start justify-between mb-2">
+                    <div className="flex items-center gap-2">
+                      <div className="w-8 h-8 bg-gradient-to-br from-purple-400 to-pink-500 rounded-lg flex items-center justify-center">
+                        <span className="text-white font-bold text-sm">C</span>
+                      </div>
+                      <div>
+                        <h4 className="font-semibold text-white">
+                          Claude 3.5 Sonnet
+                        </h4>
+                        <p className="text-xs text-gray-400">Anthropic</p>
+                      </div>
+                    </div>
+                    {selectedAiModel === "Claude 3.5 Sonnet" && (
+                      <svg
+                        className="w-5 h-5 text-purple-400"
+                        fill="currentColor"
+                        viewBox="0 0 20 20"
+                      >
+                        <path
+                          fillRule="evenodd"
+                          d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                          clipRule="evenodd"
+                        />
+                      </svg>
+                    )}
+                  </div>
+                  <p className="text-xs text-gray-300 mb-2">
+                    Balanced performance with strong reasoning and creative
+                    capabilities.
+                  </p>
+                  <div className="flex gap-2 flex-wrap">
+                    <span className="text-[10px] px-2 py-0.5 bg-purple-500/20 text-purple-300 rounded-full">
+                      Text Gen
+                    </span>
+                    <span className="text-[10px] px-2 py-0.5 bg-purple-500/20 text-purple-300 rounded-full">
+                      Code Gen
+                    </span>
+                  </div>
+                </button>
+
+                {/* DALL-E 3 */}
+                <button
+                  onClick={() => {
+                    setSelectedAiModel("DALL-E 3");
+                    setShowAiModal(false);
+                  }}
+                  className={`text-left p-4 rounded-xl border-2 transition-all group ${
+                    selectedAiModel === "DALL-E 3"
+                      ? "bg-blue-500/20 border-blue-500 shadow-lg shadow-blue-500/20"
+                      : "bg-gray-800/50 border-gray-700 hover:border-blue-500/50 hover:bg-gray-800"
+                  }`}
+                >
+                  <div className="flex items-start justify-between mb-2">
+                    <div className="flex items-center gap-2">
+                      <div className="w-8 h-8 bg-gradient-to-br from-blue-400 to-indigo-500 rounded-lg flex items-center justify-center">
+                        <span className="text-white font-bold text-sm">D</span>
+                      </div>
+                      <div>
+                        <h4 className="font-semibold text-white">DALL-E 3</h4>
+                        <p className="text-xs text-gray-400">OpenAI</p>
+                      </div>
+                    </div>
+                    {selectedAiModel === "DALL-E 3" && (
+                      <svg
+                        className="w-5 h-5 text-blue-400"
+                        fill="currentColor"
+                        viewBox="0 0 20 20"
+                      >
+                        <path
+                          fillRule="evenodd"
+                          d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                          clipRule="evenodd"
+                        />
+                      </svg>
+                    )}
+                  </div>
+                  <p className="text-xs text-gray-300 mb-2">
+                    Creative image generation with precise prompt following.
+                  </p>
+                  <div className="flex gap-2 flex-wrap">
+                    <span className="text-[10px] px-2 py-0.5 bg-blue-500/20 text-blue-300 rounded-full">
+                      Image Gen
+                    </span>
+                  </div>
+                </button>
+
+                {/* Llama 3.1 */}
+                <button
+                  onClick={() => {
+                    setSelectedAiModel("Llama 3.1 405B");
+                    setShowAiModal(false);
+                  }}
+                  className={`text-left p-4 rounded-xl border-2 transition-all group ${
+                    selectedAiModel === "Llama 3.1 405B"
+                      ? "bg-orange-500/20 border-orange-500 shadow-lg shadow-orange-500/20"
+                      : "bg-gray-800/50 border-gray-700 hover:border-orange-500/50 hover:bg-gray-800"
+                  }`}
+                >
+                  <div className="flex items-start justify-between mb-2">
+                    <div className="flex items-center gap-2">
+                      <div className="w-8 h-8 bg-gradient-to-br from-orange-400 to-red-500 rounded-lg flex items-center justify-center">
+                        <span className="text-white font-bold text-sm">L</span>
+                      </div>
+                      <div>
+                        <h4 className="font-semibold text-white">
+                          Llama 3.1 405B
+                        </h4>
+                        <p className="text-xs text-gray-400">Meta</p>
+                      </div>
+                    </div>
+                    {selectedAiModel === "Llama 3.1 405B" && (
+                      <svg
+                        className="w-5 h-5 text-orange-400"
+                        fill="currentColor"
+                        viewBox="0 0 20 20"
+                      >
+                        <path
+                          fillRule="evenodd"
+                          d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                          clipRule="evenodd"
+                        />
+                      </svg>
+                    )}
+                  </div>
+                  <p className="text-xs text-gray-300 mb-2">
+                    Open-source powerhouse with exceptional multilingual
+                    capabilities.
+                  </p>
+                  <div className="flex gap-2 flex-wrap">
+                    <span className="text-[10px] px-2 py-0.5 bg-orange-500/20 text-orange-300 rounded-full">
+                      Text Gen
+                    </span>
+                    <span className="text-[10px] px-2 py-0.5 bg-orange-500/20 text-orange-300 rounded-full">
+                      Code Gen
+                    </span>
+                  </div>
+                </button>
+
+                {/* Stable Diffusion XL */}
+                <button
+                  onClick={() => {
+                    setSelectedAiModel("Stable Diffusion XL");
+                    setShowAiModal(false);
+                  }}
+                  className={`text-left p-4 rounded-xl border-2 transition-all group ${
+                    selectedAiModel === "Stable Diffusion XL"
+                      ? "bg-pink-500/20 border-pink-500 shadow-lg shadow-pink-500/20"
+                      : "bg-gray-800/50 border-gray-700 hover:border-pink-500/50 hover:bg-gray-800"
+                  }`}
+                >
+                  <div className="flex items-start justify-between mb-2">
+                    <div className="flex items-center gap-2">
+                      <div className="w-8 h-8 bg-gradient-to-br from-pink-400 to-rose-500 rounded-lg flex items-center justify-center">
+                        <span className="text-white font-bold text-sm">S</span>
+                      </div>
+                      <div>
+                        <h4 className="font-semibold text-white">
+                          Stable Diffusion XL
+                        </h4>
+                        <p className="text-xs text-gray-400">Stability AI</p>
+                      </div>
+                    </div>
+                    {selectedAiModel === "Stable Diffusion XL" && (
+                      <svg
+                        className="w-5 h-5 text-pink-400"
+                        fill="currentColor"
+                        viewBox="0 0 20 20"
+                      >
+                        <path
+                          fillRule="evenodd"
+                          d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                          clipRule="evenodd"
+                        />
+                      </svg>
+                    )}
+                  </div>
+                  <p className="text-xs text-gray-300 mb-2">
+                    High-quality open-source image generation with fine control.
+                  </p>
+                  <div className="flex gap-2 flex-wrap">
+                    <span className="text-[10px] px-2 py-0.5 bg-pink-500/20 text-pink-300 rounded-full">
+                      Image Gen
+                    </span>
+                  </div>
+                </button>
+              </div>
+
+              {/* Footer Info */}
+              <div className="mt-6 p-3 bg-teal-500/10 border border-teal-500/30 rounded-lg">
+                <p className="text-xs text-teal-300 flex items-start gap-2">
+                  <svg
+                    className="w-4 h-4 shrink-0 mt-0.5"
+                    fill="currentColor"
+                    viewBox="0 0 20 20"
+                  >
+                    <path
+                      fillRule="evenodd"
+                      d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
+                      clipRule="evenodd"
+                    />
+                  </svg>
+                  <span>
+                    Model selection affects capabilities across different tabs.
+                    Some models specialize in specific tasks like image
+                    generation or code writing.
+                  </span>
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Language Conversion Modal */}
       {showConversionModal && (
