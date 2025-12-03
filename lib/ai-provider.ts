@@ -19,6 +19,16 @@ export interface AIProviderInfo {
   supportsImageGeneration: boolean;
 }
 
+// Map AI model display names to their providers
+export const AI_MODEL_TO_PROVIDER: Record<string, AIProvider> = {
+  "Gemini 2.5 Flash": "gemini",
+  "GPT-4 Turbo": "openai",
+  "Claude 3.5 Sonnet": "claude",
+  "DALL-E 3": "openai",
+  "Llama 3.1 405B": "openai", // Using OpenAI-compatible API
+  "Stable Diffusion XL": "openai", // Using OpenAI-compatible API
+};
+
 export const AI_PROVIDERS: Record<AIProvider, AIProviderInfo> = {
   gemini: {
     name: "Google Gemini",
@@ -49,8 +59,10 @@ export const AI_PROVIDERS: Record<AIProvider, AIProviderInfo> = {
   },
 };
 
-export function getAIProvider() {
-  const apiSource = (process.env.API_SOURCE?.toLowerCase() ||
+export function getAIProvider(overrideProvider?: AIProvider) {
+  // Use override provider if provided, otherwise fall back to env variable
+  const apiSource = (overrideProvider ||
+    (process.env.API_SOURCE?.toLowerCase() as AIProvider) ||
     "gemini") as AIProvider;
 
   if (!AI_PROVIDERS[apiSource]) {
@@ -77,8 +89,11 @@ export function getAIProvider() {
   };
 }
 
-export function getAIModel(forImageGeneration = false) {
-  const { provider, apiKey, providerInfo } = getAIProvider();
+export function getAIModel(
+  forImageGeneration = false,
+  overrideProvider?: AIProvider
+) {
+  const { provider, apiKey, providerInfo } = getAIProvider(overrideProvider);
 
   if (forImageGeneration && !providerInfo.supportsImageGeneration) {
     throw new Error(`${providerInfo.name} does not support image generation`);

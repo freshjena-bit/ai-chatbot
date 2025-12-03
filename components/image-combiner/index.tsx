@@ -276,6 +276,7 @@ export function ImageCombiner() {
         body: JSON.stringify({
           prompt: fullPrompt + languageInstruction,
           language: targetLanguage,
+          aiModel: selectedAiModel,
         }),
       });
 
@@ -339,7 +340,10 @@ export function ImageCombiner() {
       const response = await fetch("/api/generate-text", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ prompt: textPrompt }),
+        body: JSON.stringify({
+          prompt: textPrompt,
+          aiModel: selectedAiModel,
+        }),
       });
 
       if (!response.ok) {
@@ -384,6 +388,14 @@ export function ImageCombiner() {
   const [apiKeyMissing, setApiKeyMissing] = useState(false);
   const [showAiModal, setShowAiModal] = useState(false);
   const [selectedAiModel, setSelectedAiModel] = useState("Gemini 2.5 Flash");
+  const [availableKeys, setAvailableKeys] = useState<Record<string, boolean>>({
+    gemini: false,
+    openai: false,
+    claude: false,
+    llama: false,
+    dalle: false,
+    stability: false,
+  });
 
   const [leftWidth, setLeftWidth] = useState(50); // percentage
   const [isResizing, setIsResizing] = useState(false);
@@ -398,6 +410,22 @@ export function ImageCombiner() {
     setToast({ message, type });
     setTimeout(() => setToast(null), 3000);
   };
+
+  // Check for available API keys
+  useEffect(() => {
+    const checkApiKeys = async () => {
+      try {
+        const response = await fetch("/api/check-api-keys");
+        if (response.ok) {
+          const data = await response.json();
+          setAvailableKeys(data.available || {});
+        }
+      } catch (error) {
+        console.error("Failed to check API keys:", error);
+      }
+    };
+    checkApiKeys();
+  }, []);
 
   const {
     image1,
@@ -445,6 +473,7 @@ export function ImageCombiner() {
     image1Url,
     image2Url,
     useUrls,
+    aiModel: selectedAiModel,
     generations: persistedGenerations,
     setGenerations: setPersistedGenerations,
     addGeneration,
@@ -2309,15 +2338,27 @@ function greet(name) {
                 {/* Gemini 2.5 Flash */}
                 <button
                   onClick={() => {
-                    setSelectedAiModel("Gemini 2.5 Flash");
-                    setShowAiModal(false);
+                    if (availableKeys.gemini) {
+                      setSelectedAiModel("Gemini 2.5 Flash");
+                      setShowAiModal(false);
+                    }
                   }}
-                  className={`text-left p-4 rounded-xl border-2 transition-all group ${
-                    selectedAiModel === "Gemini 2.5 Flash"
+                  disabled={!availableKeys.gemini}
+                  className={`text-left p-4 rounded-xl border-2 transition-all group relative ${
+                    !availableKeys.gemini
+                      ? "opacity-50 cursor-not-allowed bg-gray-900/50 border-gray-700"
+                      : selectedAiModel === "Gemini 2.5 Flash"
                       ? "bg-teal-500/20 border-teal-500 shadow-lg shadow-teal-500/20"
                       : "bg-gray-800/50 border-gray-700 hover:border-teal-500/50 hover:bg-gray-800"
                   }`}
                 >
+                  {!availableKeys.gemini && (
+                    <div className="absolute top-2 right-2 bg-red-500/20 border border-red-500/50 rounded px-2 py-0.5">
+                      <span className="text-[10px] text-red-400 font-medium">
+                        No API Key
+                      </span>
+                    </div>
+                  )}
                   <div className="flex items-start justify-between mb-2">
                     <div className="flex items-center gap-2">
                       <div className="w-8 h-8 bg-gradient-to-br from-teal-400 to-cyan-500 rounded-lg flex items-center justify-center">
@@ -2330,19 +2371,20 @@ function greet(name) {
                         <p className="text-xs text-gray-400">Google AI</p>
                       </div>
                     </div>
-                    {selectedAiModel === "Gemini 2.5 Flash" && (
-                      <svg
-                        className="w-5 h-5 text-teal-400"
-                        fill="currentColor"
-                        viewBox="0 0 20 20"
-                      >
-                        <path
-                          fillRule="evenodd"
-                          d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                          clipRule="evenodd"
-                        />
-                      </svg>
-                    )}
+                    {selectedAiModel === "Gemini 2.5 Flash" &&
+                      availableKeys.gemini && (
+                        <svg
+                          className="w-5 h-5 text-teal-400"
+                          fill="currentColor"
+                          viewBox="0 0 20 20"
+                        >
+                          <path
+                            fillRule="evenodd"
+                            d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                            clipRule="evenodd"
+                          />
+                        </svg>
+                      )}
                   </div>
                   <p className="text-xs text-gray-300 mb-2">
                     Fast, efficient multimodal AI for images, text, and code
@@ -2364,15 +2406,27 @@ function greet(name) {
                 {/* GPT-4 */}
                 <button
                   onClick={() => {
-                    setSelectedAiModel("GPT-4 Turbo");
-                    setShowAiModal(false);
+                    if (availableKeys.openai) {
+                      setSelectedAiModel("GPT-4 Turbo");
+                      setShowAiModal(false);
+                    }
                   }}
-                  className={`text-left p-4 rounded-xl border-2 transition-all group ${
-                    selectedAiModel === "GPT-4 Turbo"
+                  disabled={!availableKeys.openai}
+                  className={`text-left p-4 rounded-xl border-2 transition-all group relative ${
+                    !availableKeys.openai
+                      ? "opacity-50 cursor-not-allowed bg-gray-900/50 border-gray-700"
+                      : selectedAiModel === "GPT-4 Turbo"
                       ? "bg-green-500/20 border-green-500 shadow-lg shadow-green-500/20"
                       : "bg-gray-800/50 border-gray-700 hover:border-green-500/50 hover:bg-gray-800"
                   }`}
                 >
+                  {!availableKeys.openai && (
+                    <div className="absolute top-2 right-2 bg-red-500/20 border border-red-500/50 rounded px-2 py-0.5">
+                      <span className="text-[10px] text-red-400 font-medium">
+                        No API Key
+                      </span>
+                    </div>
+                  )}
                   <div className="flex items-start justify-between mb-2">
                     <div className="flex items-center gap-2">
                       <div className="w-8 h-8 bg-gradient-to-br from-green-400 to-emerald-500 rounded-lg flex items-center justify-center">
@@ -2385,19 +2439,20 @@ function greet(name) {
                         <p className="text-xs text-gray-400">OpenAI</p>
                       </div>
                     </div>
-                    {selectedAiModel === "GPT-4 Turbo" && (
-                      <svg
-                        className="w-5 h-5 text-green-400"
-                        fill="currentColor"
-                        viewBox="0 0 20 20"
-                      >
-                        <path
-                          fillRule="evenodd"
-                          d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                          clipRule="evenodd"
-                        />
-                      </svg>
-                    )}
+                    {selectedAiModel === "GPT-4 Turbo" &&
+                      availableKeys.openai && (
+                        <svg
+                          className="w-5 h-5 text-green-400"
+                          fill="currentColor"
+                          viewBox="0 0 20 20"
+                        >
+                          <path
+                            fillRule="evenodd"
+                            d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                            clipRule="evenodd"
+                          />
+                        </svg>
+                      )}
                   </div>
                   <p className="text-xs text-gray-300 mb-2">
                     Advanced reasoning and comprehensive knowledge for complex
@@ -2416,15 +2471,27 @@ function greet(name) {
                 {/* Claude 3.5 Sonnet */}
                 <button
                   onClick={() => {
-                    setSelectedAiModel("Claude 3.5 Sonnet");
-                    setShowAiModal(false);
+                    if (availableKeys.claude) {
+                      setSelectedAiModel("Claude 3.5 Sonnet");
+                      setShowAiModal(false);
+                    }
                   }}
-                  className={`text-left p-4 rounded-xl border-2 transition-all group ${
-                    selectedAiModel === "Claude 3.5 Sonnet"
+                  disabled={!availableKeys.claude}
+                  className={`text-left p-4 rounded-xl border-2 transition-all group relative ${
+                    !availableKeys.claude
+                      ? "opacity-50 cursor-not-allowed bg-gray-900/50 border-gray-700"
+                      : selectedAiModel === "Claude 3.5 Sonnet"
                       ? "bg-purple-500/20 border-purple-500 shadow-lg shadow-purple-500/20"
                       : "bg-gray-800/50 border-gray-700 hover:border-purple-500/50 hover:bg-gray-800"
                   }`}
                 >
+                  {!availableKeys.claude && (
+                    <div className="absolute top-2 right-2 bg-red-500/20 border border-red-500/50 rounded px-2 py-0.5">
+                      <span className="text-[10px] text-red-400 font-medium">
+                        No API Key
+                      </span>
+                    </div>
+                  )}
                   <div className="flex items-start justify-between mb-2">
                     <div className="flex items-center gap-2">
                       <div className="w-8 h-8 bg-gradient-to-br from-purple-400 to-pink-500 rounded-lg flex items-center justify-center">
@@ -2437,19 +2504,20 @@ function greet(name) {
                         <p className="text-xs text-gray-400">Anthropic</p>
                       </div>
                     </div>
-                    {selectedAiModel === "Claude 3.5 Sonnet" && (
-                      <svg
-                        className="w-5 h-5 text-purple-400"
-                        fill="currentColor"
-                        viewBox="0 0 20 20"
-                      >
-                        <path
-                          fillRule="evenodd"
-                          d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                          clipRule="evenodd"
-                        />
-                      </svg>
-                    )}
+                    {selectedAiModel === "Claude 3.5 Sonnet" &&
+                      availableKeys.claude && (
+                        <svg
+                          className="w-5 h-5 text-purple-400"
+                          fill="currentColor"
+                          viewBox="0 0 20 20"
+                        >
+                          <path
+                            fillRule="evenodd"
+                            d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                            clipRule="evenodd"
+                          />
+                        </svg>
+                      )}
                   </div>
                   <p className="text-xs text-gray-300 mb-2">
                     Balanced performance with strong reasoning and creative
@@ -2468,15 +2536,27 @@ function greet(name) {
                 {/* DALL-E 3 */}
                 <button
                   onClick={() => {
-                    setSelectedAiModel("DALL-E 3");
-                    setShowAiModal(false);
+                    if (availableKeys.dalle) {
+                      setSelectedAiModel("DALL-E 3");
+                      setShowAiModal(false);
+                    }
                   }}
-                  className={`text-left p-4 rounded-xl border-2 transition-all group ${
-                    selectedAiModel === "DALL-E 3"
+                  disabled={!availableKeys.dalle}
+                  className={`text-left p-4 rounded-xl border-2 transition-all group relative ${
+                    !availableKeys.dalle
+                      ? "opacity-50 cursor-not-allowed bg-gray-900/50 border-gray-700"
+                      : selectedAiModel === "DALL-E 3"
                       ? "bg-blue-500/20 border-blue-500 shadow-lg shadow-blue-500/20"
                       : "bg-gray-800/50 border-gray-700 hover:border-blue-500/50 hover:bg-gray-800"
                   }`}
                 >
+                  {!availableKeys.dalle && (
+                    <div className="absolute top-2 right-2 bg-red-500/20 border border-red-500/50 rounded px-2 py-0.5">
+                      <span className="text-[10px] text-red-400 font-medium">
+                        No API Key
+                      </span>
+                    </div>
+                  )}
                   <div className="flex items-start justify-between mb-2">
                     <div className="flex items-center gap-2">
                       <div className="w-8 h-8 bg-gradient-to-br from-blue-400 to-indigo-500 rounded-lg flex items-center justify-center">
@@ -2487,7 +2567,7 @@ function greet(name) {
                         <p className="text-xs text-gray-400">OpenAI</p>
                       </div>
                     </div>
-                    {selectedAiModel === "DALL-E 3" && (
+                    {selectedAiModel === "DALL-E 3" && availableKeys.dalle && (
                       <svg
                         className="w-5 h-5 text-blue-400"
                         fill="currentColor"
@@ -2514,15 +2594,27 @@ function greet(name) {
                 {/* Llama 3.1 */}
                 <button
                   onClick={() => {
-                    setSelectedAiModel("Llama 3.1 405B");
-                    setShowAiModal(false);
+                    if (availableKeys.llama) {
+                      setSelectedAiModel("Llama 3.1 405B");
+                      setShowAiModal(false);
+                    }
                   }}
-                  className={`text-left p-4 rounded-xl border-2 transition-all group ${
-                    selectedAiModel === "Llama 3.1 405B"
+                  disabled={!availableKeys.llama}
+                  className={`text-left p-4 rounded-xl border-2 transition-all group relative ${
+                    !availableKeys.llama
+                      ? "opacity-50 cursor-not-allowed bg-gray-900/50 border-gray-700"
+                      : selectedAiModel === "Llama 3.1 405B"
                       ? "bg-orange-500/20 border-orange-500 shadow-lg shadow-orange-500/20"
                       : "bg-gray-800/50 border-gray-700 hover:border-orange-500/50 hover:bg-gray-800"
                   }`}
                 >
+                  {!availableKeys.llama && (
+                    <div className="absolute top-2 right-2 bg-red-500/20 border border-red-500/50 rounded px-2 py-0.5">
+                      <span className="text-[10px] text-red-400 font-medium">
+                        No API Key
+                      </span>
+                    </div>
+                  )}
                   <div className="flex items-start justify-between mb-2">
                     <div className="flex items-center gap-2">
                       <div className="w-8 h-8 bg-gradient-to-br from-orange-400 to-red-500 rounded-lg flex items-center justify-center">
@@ -2535,19 +2627,20 @@ function greet(name) {
                         <p className="text-xs text-gray-400">Meta</p>
                       </div>
                     </div>
-                    {selectedAiModel === "Llama 3.1 405B" && (
-                      <svg
-                        className="w-5 h-5 text-orange-400"
-                        fill="currentColor"
-                        viewBox="0 0 20 20"
-                      >
-                        <path
-                          fillRule="evenodd"
-                          d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                          clipRule="evenodd"
-                        />
-                      </svg>
-                    )}
+                    {selectedAiModel === "Llama 3.1 405B" &&
+                      availableKeys.llama && (
+                        <svg
+                          className="w-5 h-5 text-orange-400"
+                          fill="currentColor"
+                          viewBox="0 0 20 20"
+                        >
+                          <path
+                            fillRule="evenodd"
+                            d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                            clipRule="evenodd"
+                          />
+                        </svg>
+                      )}
                   </div>
                   <p className="text-xs text-gray-300 mb-2">
                     Open-source powerhouse with exceptional multilingual
@@ -2566,15 +2659,27 @@ function greet(name) {
                 {/* Stable Diffusion XL */}
                 <button
                   onClick={() => {
-                    setSelectedAiModel("Stable Diffusion XL");
-                    setShowAiModal(false);
+                    if (availableKeys.stability) {
+                      setSelectedAiModel("Stable Diffusion XL");
+                      setShowAiModal(false);
+                    }
                   }}
-                  className={`text-left p-4 rounded-xl border-2 transition-all group ${
-                    selectedAiModel === "Stable Diffusion XL"
+                  disabled={!availableKeys.stability}
+                  className={`text-left p-4 rounded-xl border-2 transition-all group relative ${
+                    !availableKeys.stability
+                      ? "opacity-50 cursor-not-allowed bg-gray-900/50 border-gray-700"
+                      : selectedAiModel === "Stable Diffusion XL"
                       ? "bg-pink-500/20 border-pink-500 shadow-lg shadow-pink-500/20"
                       : "bg-gray-800/50 border-gray-700 hover:border-pink-500/50 hover:bg-gray-800"
                   }`}
                 >
+                  {!availableKeys.stability && (
+                    <div className="absolute top-2 right-2 bg-red-500/20 border border-red-500/50 rounded px-2 py-0.5">
+                      <span className="text-[10px] text-red-400 font-medium">
+                        No API Key
+                      </span>
+                    </div>
+                  )}
                   <div className="flex items-start justify-between mb-2">
                     <div className="flex items-center gap-2">
                       <div className="w-8 h-8 bg-gradient-to-br from-pink-400 to-rose-500 rounded-lg flex items-center justify-center">
@@ -2587,19 +2692,20 @@ function greet(name) {
                         <p className="text-xs text-gray-400">Stability AI</p>
                       </div>
                     </div>
-                    {selectedAiModel === "Stable Diffusion XL" && (
-                      <svg
-                        className="w-5 h-5 text-pink-400"
-                        fill="currentColor"
-                        viewBox="0 0 20 20"
-                      >
-                        <path
-                          fillRule="evenodd"
-                          d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                          clipRule="evenodd"
-                        />
-                      </svg>
-                    )}
+                    {selectedAiModel === "Stable Diffusion XL" &&
+                      availableKeys.stability && (
+                        <svg
+                          className="w-5 h-5 text-pink-400"
+                          fill="currentColor"
+                          viewBox="0 0 20 20"
+                        >
+                          <path
+                            fillRule="evenodd"
+                            d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                            clipRule="evenodd"
+                          />
+                        </svg>
+                      )}
                   </div>
                   <p className="text-xs text-gray-300 mb-2">
                     High-quality open-source image generation with fine control.

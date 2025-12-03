@@ -6,6 +6,8 @@ import {
   getProviderSpecificOptions,
   getAIProvider,
   AI_PROVIDERS,
+  AI_MODEL_TO_PROVIDER,
+  type AIProvider,
 } from "@/lib/ai-provider";
 
 export const dynamic = "force-dynamic";
@@ -40,13 +42,20 @@ interface ErrorResponse {
 
 export async function POST(request: NextRequest) {
   try {
-    // Get AI provider configuration
-    const { provider, providerInfo } = getAIProvider();
-
     const formData = await request.formData();
     const mode = formData.get("mode") as string;
     const prompt = formData.get("prompt") as string;
     const aspectRatio = formData.get("aspectRatio") as string;
+    const aiModel = formData.get("aiModel") as string;
+
+    // Determine provider from selected AI model
+    const providerOverride =
+      aiModel && AI_MODEL_TO_PROVIDER[aiModel]
+        ? AI_MODEL_TO_PROVIDER[aiModel]
+        : undefined;
+
+    // Get AI provider configuration
+    const { provider, providerInfo } = getAIProvider(providerOverride);
 
     if (!mode) {
       return NextResponse.json<ErrorResponse>(
@@ -96,7 +105,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const model = getAIModel(true);
+    const model = getAIModel(true, providerOverride);
 
     if (mode === "text-to-image") {
       try {
