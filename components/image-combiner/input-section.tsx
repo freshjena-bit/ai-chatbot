@@ -45,7 +45,7 @@ interface InputSectionProps {
   onKeyDown: (e: React.KeyboardEvent<HTMLTextAreaElement>) => void;
   onPromptPaste: (e: React.ClipboardEvent<HTMLTextAreaElement>) => void;
   onImageFullscreen: (url: string) => void;
-  promptTextareaRef: React.RefObject<HTMLTextAreaElement>;
+  promptTextareaRef: React.RefObject<HTMLTextAreaElement | null>;
   isAuthenticated?: boolean;
   remaining?: number;
   decrementOptimistic?: () => void;
