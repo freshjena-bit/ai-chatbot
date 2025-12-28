@@ -1,28 +1,28 @@
-"use client"
+"use client";
 
-import { Button } from "@/components/ui/button"
-import { cn } from "@/lib/utils"
-import { ProgressBar } from "./progress-bar"
-import { useMobile } from "@/hooks/use-mobile"
-import type { Generation } from "./hooks/use-image-generation"
-import { useEffect } from "react"
+import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
+import { ProgressBar } from "./progress-bar";
+import { useMobile } from "@/hooks/use-mobile";
+import { useEffect } from "react";
+import { Generation } from "./types";
 
 interface OutputSectionProps {
-  selectedGeneration: Generation | undefined
-  generations: Generation[]
-  selectedGenerationId: string | null
-  setSelectedGenerationId: (id: string) => void
-  isConvertingHeic: boolean
-  heicProgress: number
-  imageLoaded: boolean
-  setImageLoaded: (loaded: boolean) => void
-  onCancelGeneration: (id: string) => void
-  onDeleteGeneration: (id: string) => void
-  onOpenFullscreen: () => void
-  onLoadAsInput: () => void
-  onCopy: () => void
-  onDownload: () => void
-  onOpenInNewTab: () => void
+  selectedGeneration: Generation | undefined;
+  generations: Generation[];
+  selectedGenerationId: string | null;
+  setSelectedGenerationId: (id: string) => void;
+  isConvertingHeic: boolean;
+  heicProgress: number;
+  imageLoaded: boolean;
+  setImageLoaded: (loaded: boolean) => void;
+  onCancelGeneration: (id: string) => void;
+  onDeleteGeneration: (id: string) => void;
+  onOpenFullscreen: () => void;
+  onLoadAsInput: () => void;
+  onCopy: () => void;
+  onDownload: () => void;
+  onOpenInNewTab: () => void;
 }
 
 export function OutputSection({
@@ -42,44 +42,48 @@ export function OutputSection({
   onDownload,
   onOpenInNewTab,
 }: OutputSectionProps) {
-  const isMobile = useMobile()
+  const isMobile = useMobile();
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      const activeElement = document.activeElement
-      const isTyping = activeElement?.tagName === "TEXTAREA" || activeElement?.tagName === "INPUT"
+      const activeElement = document.activeElement;
+      const isTyping =
+        activeElement?.tagName === "TEXTAREA" ||
+        activeElement?.tagName === "INPUT";
 
       if ((e.key === "ArrowLeft" || e.key === "ArrowRight") && !isTyping) {
-        if (generations.length <= 1) return
+        if (generations.length <= 1) return;
 
-        e.preventDefault()
-        const currentIndex = generations.findIndex((g) => g.id === selectedGenerationId)
+        e.preventDefault();
+        const currentIndex = generations.findIndex(
+          (g) => g.id === selectedGenerationId
+        );
         if (currentIndex === -1 && generations.length > 0) {
-          setSelectedGenerationId(generations[0].id)
-          return
+          setSelectedGenerationId(generations[0].id);
+          return;
         }
 
-        let newIndex
+        let newIndex;
         if (e.key === "ArrowLeft") {
-          newIndex = currentIndex - 1
+          newIndex = currentIndex - 1;
         } else {
-          newIndex = currentIndex + 1
+          newIndex = currentIndex + 1;
         }
 
         if (newIndex >= 0 && newIndex < generations.length) {
-          setSelectedGenerationId(generations[newIndex].id)
+          setSelectedGenerationId(generations[newIndex].id);
         }
       }
-    }
+    };
 
-    window.addEventListener("keydown", handleKeyDown)
-    return () => window.removeEventListener("keydown", handleKeyDown)
-  }, [generations, selectedGenerationId, setSelectedGenerationId])
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [generations, selectedGenerationId, setSelectedGenerationId]);
 
   const generatedImage =
     selectedGeneration?.status === "complete" && selectedGeneration.imageUrl
       ? { url: selectedGeneration.imageUrl, prompt: selectedGeneration.prompt }
-      : null
+      : null;
 
   const renderButtons = (className?: string) => (
     <div className={className}>
@@ -91,8 +95,18 @@ export function OutputSection({
         className="text-xs h-7 px-2 md:px-3 bg-transparent border-gray-600 text-white hover:bg-gray-700 flex items-center gap-1 lg:bg-black/80 lg:backdrop-blur-sm disabled:opacity-50 disabled:cursor-not-allowed"
         title="Use as Input"
       >
-        <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+        <svg
+          className="w-3 h-3"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M10 19l-7-7m0 0l7-7m-7 7h18"
+          />
         </svg>
         <span className="hidden sm:inline">Use as Input</span>
       </Button>
@@ -104,9 +118,25 @@ export function OutputSection({
         className="text-xs h-7 px-2 md:px-3 bg-transparent border-gray-600 text-white hover:bg-gray-700 flex items-center gap-1 lg:bg-black/80 lg:backdrop-blur-sm disabled:opacity-50 disabled:cursor-not-allowed"
         title={isMobile ? "Copy to clipboard" : "Copy to clipboard"}
       >
-        <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <rect x="9" y="9" width="13" height="13" rx="2" ry="2" strokeWidth="2" />
-          <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1" strokeWidth="2" />
+        <svg
+          className="w-3 h-3"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <rect
+            x="9"
+            y="9"
+            width="13"
+            height="13"
+            rx="2"
+            ry="2"
+            strokeWidth="2"
+          />
+          <path
+            d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"
+            strokeWidth="2"
+          />
         </svg>
         <span className="hidden sm:inline">{isMobile ? "Copy" : "Copy"}</span>
       </Button>
@@ -118,7 +148,12 @@ export function OutputSection({
         className="text-xs h-7 px-2 md:px-3 bg-transparent border-gray-600 text-white hover:bg-gray-700 flex items-center gap-1 lg:bg-black/80 lg:backdrop-blur-sm disabled:opacity-50 disabled:cursor-not-allowed"
         title="Download image"
       >
-        <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <svg
+          className="w-3 h-3"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
           <path
             strokeLinecap="round"
             strokeLinejoin="round"
@@ -129,7 +164,7 @@ export function OutputSection({
         <span className="hidden sm:inline">Download</span>
       </Button>
     </div>
-  )
+  );
 
   return (
     <div className="flex flex-col h-full min-h-0 select-none relative group/output">
@@ -143,7 +178,11 @@ export function OutputSection({
           </div>
         ) : isConvertingHeic ? (
           <div className="absolute inset-0 flex items-center justify-center bg-black/20">
-            <ProgressBar progress={heicProgress} onCancel={() => {}} isConverting />
+            <ProgressBar
+              progress={heicProgress}
+              onCancel={() => {}}
+              isConverting
+            />
           </div>
         ) : generatedImage ? (
           <div className="absolute inset-0 flex flex-col select-none">
@@ -154,7 +193,7 @@ export function OutputSection({
                 className={cn(
                   "max-w-full max-h-full transition-all duration-700 ease-out cursor-pointer",
                   "lg:w-full lg:h-full lg:object-contain",
-                  imageLoaded ? "opacity-100 scale-100" : "opacity-0 scale-95",
+                  imageLoaded ? "opacity-100 scale-100" : "opacity-0 scale-95"
                 )}
                 onLoad={() => setImageLoaded(true)}
                 onClick={onOpenFullscreen}
@@ -176,7 +215,9 @@ export function OutputSection({
                   <polyline points="21,15 16,10 5,21" />
                 </svg>
               </div>
-              <p className="text-xs text-gray-400 font-medium py-1 md:py-2">Ready to generate</p>
+              <p className="text-xs text-gray-400 font-medium py-1 md:py-2">
+                Ready to generate
+              </p>
             </div>
           </div>
         )}
@@ -186,14 +227,19 @@ export function OutputSection({
           <div className="hidden lg:flex flex-col items-center w-full absolute bottom-6 z-30 pointer-events-none gap-2">
             {/* Buttons - pointer-events-auto to allow clicking */}
             <div className="pointer-events-auto">
-              {renderButtons("flex justify-center gap-2 transition-all duration-200")}
+              {renderButtons(
+                "flex justify-center gap-2 transition-all duration-200"
+              )}
             </div>
           </div>
         )}
       </div>
 
       {/* Mobile/Tablet buttons - below the image container */}
-      {generations.length > 0 && renderButtons("mt-3 md:mt-4 flex lg:hidden justify-center gap-2 flex-shrink-0")}
+      {generations.length > 0 &&
+        renderButtons(
+          "mt-3 md:mt-4 flex lg:hidden justify-center gap-2 shrink-0"
+        )}
     </div>
-  )
+  );
 }

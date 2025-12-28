@@ -17,13 +17,13 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Nano Banana Pro - AI Creative Playground",
+  title: "AI Chatboat - AI Creative Playground",
   description:
-    "Nano Banana Pro: Create and edit stunning images with advanced AI capabilities. Generate text, code, and more with our powerful AI tools.",
+    "AI Chatboat: Create and edit stunning images with advanced AI capabilities. Generate text, code, and more with our powerful AI tools.",
   keywords: [
-    "nano banana pro",
-    "nano banana",
-    "nb pro",
+    "ai chatboat",
+    "chatboat",
+    "ai chat",
     "AI image generation",
     "AI image editor",
     "AI text generation",
@@ -32,35 +32,35 @@ export const metadata: Metadata = {
     "AI art generator",
     "image editing AI",
   ],
-  authors: [{ name: "Nano Banana Pro" }],
-  creator: "Nano Banana Pro",
-  publisher: "Nano Banana Pro",
-  metadataBase: new URL("https://v0nanobananapro.vercel.app"),
+  authors: [{ name: "AI Chatboat" }],
+  creator: "AI Chatboat",
+  publisher: "AI Chatboat",
+  metadataBase: new URL("https://ai-chatboat.reactbd.com"),
   alternates: {
     canonical: "/",
   },
   openGraph: {
     type: "website",
     locale: "en_US",
-    url: "https://v0nanobananapro.vercel.app",
-    title: "Nano Banana Pro - AI Creative Playground",
+    url: "https://ai-chatboat.reactbd.com",
+    title: "AI Chatboat - AI Creative Playground",
     description:
-      "Nano Banana Pro: Google's newest AI image generation model. Create and edit stunning images with advanced AI.",
-    siteName: "Nano Banana Pro",
+      "AI Chatboat: Google's newest AI image generation model. Create and edit stunning images with advanced AI.",
+    siteName: "AI Chatboat",
     images: [
       {
         url: "/og-image.jpg",
         width: 1200,
         height: 630,
-        alt: "Nano Banana Pro Playground - AI Image Generation",
+        alt: "AI Chatboat Playground - AI Image Generation",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Nano Banana Pro Playground - Powered by Vercel AI Gateway",
+    title: "AI Chatboat Playground - Powered by Vercel AI Gateway",
     description:
-      "Nano Banana Pro: Google's newest AI image generation model. Create and edit stunning images with advanced AI.",
+      "AI Chatboat: Google's newest AI image generation model. Create and edit stunning images with advanced AI.",
     creator: "@vercel",
     images: ["/og-image.jpg"],
   },

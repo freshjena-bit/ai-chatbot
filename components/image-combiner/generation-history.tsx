@@ -1,25 +1,25 @@
-"use client"
+"use client";
 
-import type React from "react"
+import type React from "react";
 
-import { cn } from "@/lib/utils"
-import type { Generation } from "./types"
-import { Loader2 } from "lucide-react"
-import { useState } from "react"
-import Image from "next/image"
+import { cn } from "@/lib/utils";
+import type { Generation } from "./types";
+import { Loader2 } from "lucide-react";
+import { useState } from "react";
+import Image from "next/image";
 
 interface GenerationHistoryProps {
-  generations: Generation[]
-  selectedId?: string
-  onSelect: (id: string) => void
-  onCancel: (id: string) => void
-  onDelete?: (id: string) => Promise<void>
-  isLoading?: boolean
-  hasMore?: boolean
-  onLoadMore?: () => void
-  isLoadingMore?: boolean
-  className?: string
-  compact?: boolean // Added compact prop
+  generations: Generation[];
+  selectedId?: string;
+  onSelect: (id: string) => void;
+  onCancel: (id: string) => void;
+  onDelete?: (id: string) => Promise<void>;
+  isLoading?: boolean;
+  hasMore?: boolean;
+  onLoadMore?: () => void;
+  isLoadingMore?: boolean;
+  className?: string;
+  compact?: boolean; // Added compact prop
 }
 
 export function GenerationHistory({
@@ -35,31 +35,35 @@ export function GenerationHistory({
   className,
   compact = false, // Default to false
 }: GenerationHistoryProps) {
-  const [loadedImages, setLoadedImages] = useState<Set<string>>(new Set())
-  const [deletingId, setDeletingId] = useState<string | null>(null)
+  const [loadedImages, setLoadedImages] = useState<Set<string>>(new Set());
+  const [deletingId, setDeletingId] = useState<string | null>(null);
 
   const handleDelete = async (e: React.MouseEvent, id: string) => {
-    e.stopPropagation()
+    e.stopPropagation();
 
-    if (!onDelete) return
+    if (!onDelete) return;
 
-    setDeletingId(id)
+    setDeletingId(id);
     try {
-      await onDelete(id)
+      await onDelete(id);
     } catch (error) {
-      console.error("Failed to delete generation:", error)
+      console.error("Failed to delete generation:", error);
     } finally {
-      setDeletingId(null)
+      setDeletingId(null);
     }
-  }
+  };
 
   return (
     <div className={cn("flex flex-col w-full", className)}>
-      {!compact && <h4 className="text-xs md:text-sm font-medium text-gray-400 mb-1">History</h4>}
+      {!compact && (
+        <h4 className="text-xs md:text-sm font-medium text-gray-400 mb-1">
+          History
+        </h4>
+      )}
       <div
         className={cn(
           "w-full flex gap-1 overflow-x-auto scrollbar-thin scrollbar-thumb-gray-600 scrollbar-track-transparent h-20 md:h-28 items-end",
-          compact ? "pb-1" : "pb-2",
+          compact ? "pb-1" : "pb-2"
         )}
       >
         {isLoading ? (
@@ -77,20 +81,21 @@ export function GenerationHistory({
                 key={gen.id}
                 onClick={() => onSelect(gen.id)}
                 className={cn(
-                  "relative flex-shrink-0 w-18 h-18 md:w-24 md:h-24 overflow-hidden transition-all cursor-pointer group",
+                  "relative shrink-0 w-18 h-18 md:w-24 md:h-24 overflow-hidden transition-all cursor-pointer group",
                   selectedId === gen.id
                     ? "border-2 border-white opacity-100"
                     : "border border-gray-600 hover:border-gray-500 opacity-60 hover:opacity-100",
-                  index === 0 && "animate-in fade-in-0 slide-in-from-left-4 duration-500",
-                  deletingId === gen.id && "opacity-50 pointer-events-none",
+                  index === 0 &&
+                    "animate-in fade-in-0 slide-in-from-left-4 duration-500",
+                  deletingId === gen.id && "opacity-50 pointer-events-none"
                 )}
                 role="button"
                 tabIndex={0}
                 aria-label={`Generation ${index + 1}`}
                 onKeyDown={(e) => {
                   if (e.key === "Enter" || e.key === " ") {
-                    e.preventDefault()
-                    onSelect(gen.id)
+                    e.preventDefault();
+                    onSelect(gen.id);
                   }
                 }}
               >
@@ -101,8 +106,8 @@ export function GenerationHistory({
                     </span>
                     <button
                       onClick={(e) => {
-                        e.stopPropagation()
-                        onCancel(gen.id)
+                        e.stopPropagation();
+                        onCancel(gen.id);
                       }}
                       className="mt-2 text-[10px] px-2 py-0.5 bg-white/10 hover:bg-white text-white hover:text-black transition-all"
                       aria-label="Cancel generation"
@@ -119,7 +124,12 @@ export function GenerationHistory({
                       viewBox="0 0 24 24"
                       aria-hidden="true"
                     >
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M6 18L18 6M6 6l12 12"
+                      />
                     </svg>
                     <span className="sr-only">Generation failed</span>
                     {onDelete && (
@@ -139,7 +149,11 @@ export function GenerationHistory({
                             viewBox="0 0 24 24"
                             strokeWidth={2}
                           >
-                            <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              d="M6 18L18 6M6 6l12 12"
+                            />
                           </svg>
                         )}
                       </button>
@@ -164,7 +178,11 @@ export function GenerationHistory({
                             viewBox="0 0 24 24"
                             strokeWidth={2}
                           >
-                            <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              d="M6 18L18 6M6 6l12 12"
+                            />
                           </svg>
                         )}
                       </button>
@@ -176,14 +194,16 @@ export function GenerationHistory({
                       sizes="(max-width: 768px) 80px, 96px"
                       className={cn(
                         "object-cover transition-opacity duration-300",
-                        loadedImages.has(gen.id) ? "opacity-100" : "opacity-0",
+                        loadedImages.has(gen.id) ? "opacity-100" : "opacity-0"
                       )}
                       onLoad={() => {
-                        setLoadedImages((prev) => new Set(prev).add(gen.id))
+                        setLoadedImages((prev) => new Set(prev).add(gen.id));
                       }}
                       unoptimized={gen.imageUrl?.includes("blob:") ?? false}
                     />
-                    {!loadedImages.has(gen.id) && <div className="absolute inset-0 bg-gray-800 animate-pulse" />}
+                    {!loadedImages.has(gen.id) && (
+                      <div className="absolute inset-0 bg-gray-800 animate-pulse" />
+                    )}
                   </>
                 )}
               </div>
@@ -192,7 +212,7 @@ export function GenerationHistory({
               <button
                 onClick={onLoadMore}
                 disabled={isLoadingMore}
-                className="flex-shrink-0 w-18 h-18 md:w-24 md:h-24 border border-gray-600 hover:border-white bg-black/30 hover:bg-black/50 transition-all flex items-center justify-center text-xs text-gray-300 hover:text-white disabled:opacity-50 disabled:cursor-not-allowed"
+                className="shrink-0 w-18 h-18 md:w-24 md:h-24 border border-gray-600 hover:border-white bg-black/30 hover:bg-black/50 transition-all flex items-center justify-center text-xs text-gray-300 hover:text-white disabled:opacity-50 disabled:cursor-not-allowed"
                 aria-label="Load more generations"
               >
                 {isLoadingMore ? (
@@ -210,5 +230,5 @@ export function GenerationHistory({
         )}
       </div>
     </div>
-  )
+  );
 }

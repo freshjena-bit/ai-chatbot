@@ -1,6 +1,6 @@
 {
-  "name": "Nano Banana Pro",
-  "short_name": "NB Pro",
+  "name": "AI Chatboat",
+  "short_name": "AI Chatboat",
   "description": "AI-powered image generation and editing tool",
   "start_url": "/",
   "display": "standalone",

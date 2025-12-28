@@ -1354,7 +1354,7 @@ export function ImageCombiner() {
               <div className="flex items-center gap-3">
                 <div>
                   <h1 className="text-xl md:text-3xl font-bold text-white select-none leading-none">
-                    Nano Banana Pro
+                    AI Chatboat
                   </h1>
                   <p className="text-[10px] md:text-xs text-gray-400 select-none mt-1">
                     AI-Powered Creative Playground
@@ -1545,7 +1545,7 @@ export function ImageCombiner() {
                             {/* User Message */}
                             <div className="flex justify-end animate-in slide-in-from-right-4 duration-300">
                               <div className="max-w-[85%] bg-linear-to-r from-purple-600 to-violet-600 backdrop-blur-sm text-white rounded-2xl rounded-tr-sm px-5 py-3.5 shadow-xl">
-                                <p className="text-sm leading-relaxed whitespace-pre-wrap break-words">
+                                <p className="text-sm leading-relaxed whitespace-pre-wrap wrap-break-word">
                                   {conversation.prompt}
                                 </p>
                                 <p className="text-xs text-purple-200 mt-2 opacity-70">
@@ -1566,7 +1566,7 @@ export function ImageCombiner() {
                                       paragraph.trim() ? (
                                         <p
                                           key={idx}
-                                          className="whitespace-pre-wrap break-words"
+                                          className="whitespace-pre-wrap wrap-break-word"
                                         >
                                           {paragraph}
                                         </p>
@@ -1647,7 +1647,7 @@ export function ImageCombiner() {
                         <button
                           onClick={handleGenerateText}
                           disabled={!textPrompt.trim() || isGeneratingText}
-                          className="w-full px-8 py-4 bg-gradient-to-r from-purple-600 via-violet-600 to-purple-700 hover:from-purple-700 hover:via-violet-700 hover:to-purple-800 disabled:from-gray-700 disabled:via-gray-700 disabled:to-gray-800 disabled:cursor-not-allowed text-white font-semibold rounded-xl shadow-2xl shadow-purple-500/30 hover:shadow-purple-500/40 disabled:shadow-none transition-all duration-300 flex items-center justify-center gap-3 group"
+                          className="w-full px-8 py-4 bg-linear-to-r from-purple-600 via-violet-600 to-purple-700 hover:from-purple-700 hover:via-violet-700 hover:to-purple-800 disabled:from-gray-700 disabled:via-gray-700 disabled:to-gray-800 disabled:cursor-not-allowed text-white font-semibold rounded-xl shadow-2xl shadow-purple-500/30 hover:shadow-purple-500/40 disabled:shadow-none transition-all duration-300 flex items-center justify-center gap-3 group"
                         >
                           {isGeneratingText ? (
                             <>
@@ -1705,7 +1705,7 @@ export function ImageCombiner() {
                     className="flex flex-col xl:flex-row gap-4 xl:gap-0 xl:min-h-[60vh] 2xl:min-h-[62vh]"
                   >
                     <div
-                      className="flex flex-col xl:pl-4 xl:pr-4 xl:border-r xl:border-white/10 xl:pt-5 flex-shrink-0 xl:overflow-y-auto xl:max-h-[85vh] 2xl:max-h-[80vh]"
+                      className="flex flex-col xl:pl-4 xl:pr-4 xl:border-r xl:border-white/10 xl:pt-5 shrink-0 xl:overflow-y-auto xl:max-h-[85vh] 2xl:max-h-[80vh]"
                       style={{
                         width: isMobile ? "100%" : `${leftWidth}%`,
                       }}
@@ -1749,7 +1749,7 @@ export function ImageCombiner() {
                       {/* </CHANGE> */}
 
                       {/* Desktop History */}
-                      <div className="hidden xl:block mt-3 flex-shrink-0">
+                      <div className="hidden xl:block mt-3 shrink-0">
                         <GenerationHistory
                           generations={persistedGenerations}
                           selectedId={selectedGenerationId ?? undefined}
@@ -1774,7 +1774,7 @@ export function ImageCombiner() {
                     </div>
 
                     <div
-                      className="flex flex-col xl:pl-4 xl:pr-4 h-[400px] sm:h-[500px] md:h-[600px] xl:h-auto flex-shrink-0"
+                      className="flex flex-col xl:pl-4 xl:pr-4 h-[400px] sm:h-[500px] md:h-[600px] xl:h-auto shrink-0"
                       style={{
                         width: isMobile ? "100%" : `${100 - leftWidth}%`,
                       }}
@@ -1800,7 +1800,7 @@ export function ImageCombiner() {
                   </div>
 
                   {/* Mobile History - After both sections */}
-                  <div className="xl:hidden flex-shrink-0">
+                  <div className="xl:hidden shrink-0">
                     <GenerationHistory
                       generations={persistedGenerations}
                       selectedId={selectedGenerationId ?? undefined}
@@ -1898,7 +1898,7 @@ export function ImageCombiner() {
                       </button>
 
                       {showSuggestions && (
-                        <div className="px-4 pb-4 pt-2 bg-gradient-to-r from-yellow-500/5 to-orange-500/5 border-t border-yellow-500/20 animate-in slide-in-from-top-2 duration-200">
+                        <div className="px-4 pb-4 pt-2 bg-linear-to-r from-yellow-500/5 to-orange-500/5 border-t border-yellow-500/20 animate-in slide-in-from-top-2 duration-200">
                           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
                             <button
                               onClick={() => {
@@ -2068,7 +2068,7 @@ export function ImageCombiner() {
                         <button
                           onClick={() => handleGenerateCode()}
                           disabled={!codePrompt.trim() || isGeneratingCode}
-                          className="w-full py-3 bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-600 hover:to-orange-600 disabled:from-gray-700 disabled:to-gray-700 disabled:cursor-not-allowed text-white font-semibold rounded-lg shadow-lg shadow-yellow-500/30 transition-all flex items-center justify-center gap-2"
+                          className="w-full py-3 bg-linear-to-r from-yellow-500 to-orange-500 hover:from-yellow-600 hover:to-orange-600 disabled:from-gray-700 disabled:to-gray-700 disabled:cursor-not-allowed text-white font-semibold rounded-lg shadow-lg shadow-yellow-500/30 transition-all flex items-center justify-center gap-2"
                         >
                           {isGeneratingCode ? (
                             <>
@@ -2116,9 +2116,9 @@ export function ImageCombiner() {
 
                       {/* Language Conversion Tip */}
                       {generatedCode && (
-                        <div className="bg-gradient-to-r from-yellow-500/10 to-orange-500/10 border border-yellow-500/30 rounded-xl p-4 flex items-start gap-3">
+                        <div className="bg-linear-to-r from-yellow-500/10 to-orange-500/10 border border-yellow-500/30 rounded-xl p-4 flex items-start gap-3">
                           <svg
-                            className="w-5 h-5 text-yellow-400 flex-shrink-0 mt-0.5"
+                            className="w-5 h-5 text-yellow-400 shrink-0 mt-0.5"
                             fill="currentColor"
                             viewBox="0 0 20 20"
                           >
@@ -2397,7 +2397,7 @@ function greet(name) {
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         {/* Audio Generation - Pro */}
                         <div className="bg-black/50 border border-white/10 rounded-xl p-6 cursor-not-allowed opacity-75 text-left relative overflow-hidden">
-                          <div className="absolute top-3 right-3 bg-gradient-to-r from-purple-500 to-pink-500 text-white text-xs font-bold px-2 py-1 rounded-full">
+                          <div className="absolute top-3 right-3 bg-linear-to-r from-purple-500 to-pink-500 text-white text-xs font-bold px-2 py-1 rounded-full">
                             PRO
                           </div>
                           <div className="w-12 h-12 mb-4 rounded-full bg-purple-500/20 flex items-center justify-center">
@@ -2425,7 +2425,7 @@ function greet(name) {
 
                         {/* Video Generation - Pro */}
                         <div className="bg-black/50 border border-white/10 rounded-xl p-6 cursor-not-allowed opacity-75 text-left relative overflow-hidden">
-                          <div className="absolute top-3 right-3 bg-gradient-to-r from-purple-500 to-pink-500 text-white text-xs font-bold px-2 py-1 rounded-full">
+                          <div className="absolute top-3 right-3 bg-linear-to-r from-purple-500 to-pink-500 text-white text-xs font-bold px-2 py-1 rounded-full">
                             PRO
                           </div>
                           <div className="w-12 h-12 mb-4 rounded-full bg-blue-500/20 flex items-center justify-center">
@@ -2453,7 +2453,7 @@ function greet(name) {
 
                         {/* Data Analysis - Pro */}
                         <div className="bg-black/50 border border-white/10 rounded-xl p-6 cursor-not-allowed opacity-75 text-left relative overflow-hidden">
-                          <div className="absolute top-3 right-3 bg-gradient-to-r from-purple-500 to-pink-500 text-white text-xs font-bold px-2 py-1 rounded-full">
+                          <div className="absolute top-3 right-3 bg-linear-to-r from-purple-500 to-pink-500 text-white text-xs font-bold px-2 py-1 rounded-full">
                             PRO
                           </div>
                           <div className="w-12 h-12 mb-4 rounded-full bg-red-500/20 flex items-center justify-center">
@@ -2528,7 +2528,7 @@ function greet(name) {
           />
 
           {/* Modal */}
-          <div className="relative bg-gradient-to-br from-gray-900 to-black border border-teal-500/30 rounded-2xl shadow-2xl max-w-2xl w-full overflow-hidden animate-in zoom-in-95 slide-in-from-bottom-4 duration-300">
+          <div className="relative bg-linear-to-br from-gray-900 to-black border border-teal-500/30 rounded-2xl shadow-2xl max-w-2xl w-full overflow-hidden animate-in zoom-in-95 slide-in-from-bottom-4 duration-300">
             {/* Animated gradient border effect */}
             <div className="absolute inset-0 bg-linear-to-r from-teal-500/10 via-cyan-500/10 to-teal-500/10 animate-pulse pointer-events-none" />
 
@@ -2702,7 +2702,7 @@ function greet(name) {
                       <div className="flex items-start justify-between mb-2">
                         <div className="flex items-center gap-2">
                           <div
-                            className={`w-8 h-8 bg-gradient-to-br ${model.gradient} rounded-lg flex items-center justify-center`}
+                            className={`w-8 h-8 bg-linear-to-br ${model.gradient} rounded-lg flex items-center justify-center`}
                           >
                             <span className="text-white font-bold text-sm">
                               {model.icon}
@@ -2788,9 +2788,9 @@ function greet(name) {
           />
 
           {/* Modal */}
-          <div className="relative bg-gradient-to-br from-gray-900 to-gray-950 border border-yellow-500/30 rounded-2xl shadow-2xl max-w-md w-full overflow-hidden animate-in zoom-in-95 slide-in-from-bottom-4 duration-300">
+          <div className="relative bg-linear-to-br from-gray-900 to-gray-950 border border-yellow-500/30 rounded-2xl shadow-2xl max-w-md w-full overflow-hidden animate-in zoom-in-95 slide-in-from-bottom-4 duration-300">
             {/* Animated gradient border effect */}
-            <div className="absolute inset-0 bg-gradient-to-r from-yellow-500/20 via-orange-500/20 to-yellow-500/20 animate-pulse" />
+            <div className="absolute inset-0 bg-linear-to-r from-yellow-500/20 via-orange-500/20 to-yellow-500/20 animate-pulse" />
 
             {/* Content */}
             <div className="relative p-6 space-y-4">
@@ -2798,7 +2798,7 @@ function greet(name) {
               <div className="flex justify-center">
                 <div className="relative">
                   <div className="absolute inset-0 bg-yellow-500/30 rounded-full blur-xl animate-pulse" />
-                  <div className="relative w-16 h-16 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-full flex items-center justify-center shadow-lg animate-bounce">
+                  <div className="relative w-16 h-16 bg-linear-to-br from-yellow-400 to-orange-500 rounded-full flex items-center justify-center shadow-lg animate-bounce">
                     <svg
                       className="w-8 h-8 text-white"
                       fill="none"
@@ -2836,7 +2836,7 @@ function greet(name) {
               {/* Info box */}
               <div className="bg-blue-500/10 border border-blue-500/30 rounded-lg p-3 flex items-start gap-2">
                 <svg
-                  className="w-5 h-5 text-blue-400 flex-shrink-0 mt-0.5"
+                  className="w-5 h-5 text-blue-400 shrink-0 mt-0.5"
                   fill="currentColor"
                   viewBox="0 0 20 20"
                 >
@@ -2864,7 +2864,7 @@ function greet(name) {
                 </button>
                 <button
                   onClick={confirmLanguageConversion}
-                  className="flex-1 px-4 py-2.5 bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-600 hover:to-orange-600 text-white rounded-lg font-semibold shadow-lg shadow-yellow-500/30 transition-all duration-200 hover:scale-105 flex items-center justify-center gap-2"
+                  className="flex-1 px-4 py-2.5 bg-linear-to-r from-yellow-500 to-orange-500 hover:from-yellow-600 hover:to-orange-600 text-white rounded-lg font-semibold shadow-lg shadow-yellow-500/30 transition-all duration-200 hover:scale-105 flex items-center justify-center gap-2"
                 >
                   <svg
                     className="w-4 h-4"
