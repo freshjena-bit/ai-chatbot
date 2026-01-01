@@ -1,6 +1,12 @@
 # Nano Banana Pro - Free AI Creative Playground
 
-Nano Banana Pro is a cutting-edge AI creative platform built with Next.js 16 and Tailwind CSS 4. It serves as a unified interface for multiple top-tier AI models, allowing users to generate text, code, and images, as well as edit images using advanced AI tools.
+[![MIT License](https://img.shields.io/badge/License-MIT-green.svg)](https://choosealicense.com/licenses/mit/)
+[![Next.js](https://img.shields.io/badge/Next.js-16-black)](https://nextjs.org/)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind-4.0-38bdf8)](https://tailwindcss.com/)
+
+Nano Banana Pro is a cutting-edge **open-source** AI creative platform built with Next.js 16 and Tailwind CSS 4. It serves as a unified interface for multiple top-tier AI models, allowing users to generate text, code, and images, as well as edit images using advanced AI tools.
+
+**✨ Free and Open Source** - Clone, modify, and use this project for your own needs!
 
 ![Nano Banana Pro Banner](public/preview.png)
 
@@ -35,21 +41,32 @@ Seamlessly switch between the world's best AI models:
 
 Ensure you have the following installed:
 - **Node.js**: v18.17 or higher
-- **pnpm** (preferred) or npm/yarn
+- **Package Manager**: npm, pnpm, yarn, or bun (any will work!)
 
 ## 🛠️ Installation
 
 1.  **Clone the repository**
     ```bash
-    git clone https://github.com/yourusername/ai-chatbot.git
+    git clone https://github.com/noorjsdivs/ai-chatbot.git
     cd ai-chatbot
     ```
 
 2.  **Install dependencies**
+    
+    Choose your preferred package manager:
+    
     ```bash
-    pnpm install
-    # or
+    # Using npm
     npm install
+    
+    # Using pnpm (recommended for faster installs)
+    pnpm install
+    
+    # Using yarn
+    yarn install
+    
+    # Using bun
+    bun install
     ```
 
 ## ⚙️ Configuration
@@ -89,12 +106,20 @@ STABILITY_API_KEY=your_stability_key_here
 
 ## 🏃‍♂️ Running the App
 
-Start the development server:
+Start the development server with your preferred package manager:
 
 ```bash
-pnpm dev
-# or
+# Using npm
 npm run dev
+
+# Using pnpm
+pnpm dev
+
+# Using yarn
+yarn dev
+
+# Using bun
+bun dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
@@ -115,6 +140,34 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 - `⌘/Ctrl + U` : Use image as input
 - `Esc` : Close viewer
 
+## 🤝 Contributing
+
+Contributions are welcome! Feel free to:
+- Report bugs
+- Suggest new features
+- Submit pull requests
+
+Please ensure your code follows the existing style and includes appropriate tests.
+
 ## 📄 License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+This project is **free and open source**, licensed under the MIT License.
+
+You are free to:
+- ✅ Use this project for personal or commercial purposes
+- ✅ Modify and distribute the code
+- ✅ Create derivative works
+- ✅ Use it privately or publicly
+
+See the [LICENSE](LICENSE) file for full details.
+
+## 💝 Support
+
+If you find this project helpful, please consider:
+- ⭐ Giving it a star on [GitHub](https://github.com/noorjsdivs/ai-chatbot)
+- 🐛 Reporting bugs or suggesting features
+- 🤝 Contributing to the codebase
+
+---
+
+Made with ❤️ by [Noor Mohammad](https://github.com/noorjsdivs)
