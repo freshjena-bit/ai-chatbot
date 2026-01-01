@@ -13,7 +13,9 @@ Nano Banana Pro is a cutting-edge **open-source** AI creative platform built wit
 ## 🚀 Features
 
 ### 🤖 Multi-Model AI Support
+
 Seamlessly switch between the world's best AI models:
+
 - **OpenAI**: GPT-4 Turbo, GPT-4o, GPT-3.5 Turbo
 - **Google**: Gemini 2.0 Flash (Experimental), Gemini 1.5 Pro, Gemini 1.5 Flash
 - **Anthropic**: Claude 3.5 Sonnet, Claude 3 Opus, Claude 3 Haiku
@@ -22,17 +24,20 @@ Seamlessly switch between the world's best AI models:
 - **Stability AI**: Stable Diffusion XL
 
 ### 🎨 Creative Tools
+
 - **Text-to-Image Generation**: Create stunning visuals using DALL-E 3 and other supported models.
 - **AI Image Editing**: Upload images or provide URLs to edit and transform them using AI.
 - **Image Combiner**: Merge capabilities to blend images creatively.
 - **Fullscreen Viewer**: Immersive viewing experience for generated assets.
 
 ### 💻 Developer Features
+
 - **Intelligent Code Generation**: Generate code in Python, JavaScript, TypeScript, Go, Rust, and more.
 - **Code Conversion**: Automatically convert code between different programming languages.
 - **Syntax Highlighting**: Beautifully formatted code blocks with language detection.
 
 ### 🛠️ UX/UI
+
 - **Modern Interface**: Sleek, responsive design built with Tailwind CSS v4.
 - **Local History**: Your generations are saved locally in your browser for easy access.
 - **Keyboard Shortcuts**: Power-user shortcuts for quick generation and navigation.
@@ -40,38 +45,40 @@ Seamlessly switch between the world's best AI models:
 ## 📋 Prerequisites
 
 Ensure you have the following installed:
+
 - **Node.js**: v18.17 or higher
 - **Package Manager**: npm, pnpm, yarn, or bun (any will work!)
 
 ## 🛠️ Installation
 
 1.  **Clone the repository**
+
     ```bash
     git clone https://github.com/noorjsdivs/ai-chatbot.git
     cd ai-chatbot
     ```
 
 2.  **Install dependencies**
-    
+
     Choose your preferred package manager:
-    
+
     ```bash
     # Using npm
     npm install
-    
+
     # Using pnpm (recommended for faster installs)
     pnpm install
-    
+
     # Using yarn
     yarn install
-    
+
     # Using bun
     bun install
     ```
 
 ## ⚙️ Configuration
 
-To use the AI features, you must configure the API keys. 
+To use the AI features, you must configure the API keys.
 
 1.  **Create a `.env` file** in the root directory (you can copy `.env.example` if available, or use the template below).
 2.  **Add your API keys**. You only need to add keys for the providers you want to use. The app automatically detects available providers.
@@ -143,6 +150,7 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 ## 🤝 Contributing
 
 Contributions are welcome! Feel free to:
+
 - Report bugs
 - Suggest new features
 - Submit pull requests
@@ -154,6 +162,7 @@ Please ensure your code follows the existing style and includes appropriate test
 This project is **free and open source**, licensed under the MIT License.
 
 You are free to:
+
 - ✅ Use this project for personal or commercial purposes
 - ✅ Modify and distribute the code
 - ✅ Create derivative works
@@ -164,6 +173,7 @@ See the [LICENSE](LICENSE) file for full details.
 ## 💝 Support
 
 If you find this project helpful, please consider:
+
 - ⭐ Giving it a star on [GitHub](https://github.com/noorjsdivs/ai-chatbot)
 - 🐛 Reporting bugs or suggesting features
 - 🤝 Contributing to the codebase
