@@ -177,6 +177,9 @@ If you find this project helpful, please consider:
 - ⭐ Giving it a star on [GitHub](https://github.com/noorjsdivs/ai-chatbot)
 - 🐛 Reporting bugs or suggesting features
 - 🤝 Contributing to the codebase
+- ☕ [Buy me a coffee](https://buymeacoffee.com/reactbd) to support development
+
+<a href="https://buymeacoffee.com/reactbd" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" style="height: 60px !important;width: 217px !important;" ></a>
 
 ---
 
