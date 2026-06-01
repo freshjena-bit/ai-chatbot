@@ -64,7 +64,7 @@ export const AI_PROVIDERS: Record<AIProvider, AIProviderInfo> = {
   openai: {
     name: "OpenAI",
     envKeyName: "OPENAI_API_KEY",
-    defaultModel: "gpt-4o",
+    defaultModel: "gpt-5.5",
     imageModel: "dall-e-3",
     supportsImageGeneration: true,
   },
