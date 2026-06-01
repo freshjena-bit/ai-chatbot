@@ -51,7 +51,7 @@ export const AI_PROVIDERS: Record<AIProvider, AIProviderInfo> = {
   gemini: {
     name: "Google Gemini",
     envKeyName: "GEMINI_API_KEY",
-    defaultModel: "gemini-2.0-flash-exp",
+    defaultModel: "gemini-3.5-flash",
     imageModel: "imagen-3.0-generate-001",
     supportsImageGeneration: false, // Gemini doesn't support image generation via AI SDK
   },
